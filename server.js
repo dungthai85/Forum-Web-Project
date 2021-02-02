@@ -23,3 +23,6 @@ app.use('/css', express.static('css'));
 app.get('/', function(req, res) {
     res.render('../views/index')
 });
+
+
+console.log("TEST");
