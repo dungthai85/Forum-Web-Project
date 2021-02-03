@@ -17,7 +17,7 @@
   <!-- page content -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Forum Web Project</a>
+      <a class="navbar-brand" href="/">Forum Web Project</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -25,31 +25,10 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-              aria-expanded="false">
-              Add new post
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <form action="http://localhost:3000/addpost" method="POST">
-              <li>
-                  <div class="mb-3">
-                    <label for="posttitle" class="form-label">Title</label>
-                    <input type="text" class="form-control" id="posttitle" name="title" required>
-                  </div>
-                  <div class="mb-3">
-                    <label for="topicdesc" class="form-label">Description</label>
-                    <textarea class="form-control" id="topicdesc" rows="3" name="desc" required></textarea>
-                  </div>
-                  <div class="mb-3">
-                    <button class="btn btn-outline-dark" type="submit">Add Post</button>
-                  </div>
-              </li>
-            </form>
-            </ul>
-          </li>
+            <a class="nav-link active" aria-current="page">Home</a>
+            <li class="nav-item">
+              <a class="nav-link" href="/addpost">Add post</a>
+            </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Login</a>
           </li>
@@ -57,8 +36,25 @@
       </div>
     </div>
   </nav>
-  <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eum dicta voluptates commodi est explicabo aliquam! Eos
-    eius reprehenderit illo blanditiis ipsam. Aspernatur beatae repellendus nemo tempora ipsam inventore velit sint.</p>
+  
+  <!-- EJS CODE TO CREATE LIST OF TOPICS -->
+
+  <% for (var i = topics.length - 1; i > 0; i--) {%>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title"><%= topics.length - i %>. <%= topics[i].topicname %><p style="float: right; font-size: small;"><a href="/editpost">Edit Post</a></a></p></h5>
+        <p class="card-text"><%= topics[i].topicdetails %></p>
+      </div>
+      <div class="card-footer text-muted">
+        <!-- <% var myjson = JSON.stringify(topics[i].comments) %>
+        <% var myObj = JSON.parse(myjson) %> -->
+        <% console.log(Object.keys(topics[i].comments).length) %>
+        <p style="font-size: small;"><a href="#">👍</a> <%= topics[i].points %> points by <a href="#"><%= topics[i].userid %></a> | <a href="#"><%= Object.keys(topics[i].comments).length %> comments</a> <span style="float: right; font-size: small;"><a href="#">Delete Post</a> </span>  </p>
+      </div>
+    </div>
+
+
+    <% } %>
 </body>
 
 </html>

@@ -4,11 +4,12 @@ const http = require('http');
 const path = require('path');
 
 const app = express();
+const db = require('./utlities/mysqlconn');
 
 // urlencoded to help extract data from form
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/', require('./routes/topics.js'));
+app.use('/', require('./routes/topics'));
 
 // Opens server to listen to port 3000
 app.listen(3000, function () {
@@ -23,9 +24,18 @@ app.use('/css', express.static('css'));
 
 // Renders the ejs page
 app.get('/', function (req, res) {
-    res.render('../views/index');
+    db.query('SELECT * FROM TOPICS', (err, results) => {
+        if (err) throw err;
+        // console.log(results);
+        res.render('../views/index', {topics : results});
+    });
+    
 });
 
+// Renders the ejs page
+app.get('/addpost', function (req, res) {
+    res.render('../views/addpost');
+});
 
 // connection.end((err) => {
 //     console.log("Connection ended");
