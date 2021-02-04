@@ -40,20 +40,26 @@
   <!-- EJS CODE TO CREATE LIST OF TOPICS -->
 
   <% for (var i = topics.length - 1; i > 0; i--) {%>
-    <div class="card">
+    <div class="card" style="display: block;">
       <div class="card-body">
-        <h5 class="card-title"><%= topics.length - i %>. <%= topics[i].topicname %><p style="float: right; font-size: small;"><a href="/editpost">Edit Post</a></a></p></h5>
-        <p class="card-text"><%= topics[i].topicdetails %></p>
+        <h5 class="card-title"><a class="nav-link noline" href="/comment.ejs?topic=<%= topics[i].topicid%>"><%= topics.length - i %>. <%= topics[i].topicname %></a>
+          <div class="dropdown" style="float: right;">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+              <% var t = topics[i].topicid %>
+              <li><a class="nav-link" href="/editpost.ejs?topic=<%= t %>" >Edit</a></li>
+              <li><a class="nav-link" href="/deletepost.ejs?topic=<%= t %>" >Delete</a></li>
+            </ul>
+          </div>
+        </h5>
+        <a class="nav-link noline" href="/comment.ejs?topic=<%= topics[i].topicid%>"><p class="card-text"><%= topics[i].topicdetails %></p></a>
       </div>
       <div class="card-footer text-muted">
-        <!-- <% var myjson = JSON.stringify(topics[i].comments) %>
-        <% var myObj = JSON.parse(myjson) %> -->
-        <% console.log(Object.keys(topics[i].comments).length) %>
-        <p style="font-size: small;"><a href="#">👍</a> <%= topics[i].points %> points by <a href="#"><%= topics[i].userid %></a> | <a href="#"><%= Object.keys(topics[i].comments).length %> comments</a> <span style="float: right; font-size: small;"><a href="#">Delete Post</a> </span>  </p>
+        <p style="font-size: small;"><a href="/addlike?like=like&topic=<%= topics[i].topicid%>">👍</a> <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].userid %></a> | <a href="/comment.ejs?topic=<%= topics[i].topicid%>" class="noline"><%= Object.keys(topics[i].comments).length %> comments</a></p>
       </div>
     </div>
-
-
+  </a>
     <% } %>
 </body>
 

@@ -41,21 +41,21 @@
 
     <div class="card">
         <div class="card-header">
-            Add new post
+            Edit your post
         </div>
         <div class="card-body">
             <blockquote class="blockquote mb-0">
-                <form action="http://localhost:3000/addpost" method="POST">
+                <form action="http://localhost:3000/editpost" method="POST">
                     <div class="mb-3">
                         <label for="posttitle" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="posttitle" name="title" required>
+                        <input type="text" class="form-control" id="posttitle" name="title" value="<%= post[0].topicname %>" required>
                     </div>
                     <div class="mb-3">
                         <label for="topicdesc" class="form-label">Description</label>
-                        <textarea class="form-control" id="topicdesc" rows="5" name="desc" required></textarea>
+                        <textarea class="form-control" id="topicdesc" rows="5" name="desc" required><%= post[0].topicdetails %></textarea>
                     </div>
                     <div class="mb-3">
-                        <button class="btn btn-outline-dark" type="submit" >Add Post</button>
+                        <button class="btn btn-outline-dark" type="submit" name ="tid" value="<%= post[0].topicid %>">Edit Post</button>
                     </div>
                 </form>
             </blockquote>

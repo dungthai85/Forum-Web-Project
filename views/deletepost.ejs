@@ -29,7 +29,7 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link">Add post</a>
+                        <a class="nav-link active">Add post</a>
                       </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Login</a>
@@ -40,23 +40,20 @@
     </nav>
 
     <div class="card">
-        <div class="card-header">
-            Add new post
-        </div>
         <div class="card-body">
             <blockquote class="blockquote mb-0">
-                <form action="http://localhost:3000/addpost" method="POST">
-                    <div class="mb-3">
-                        <label for="posttitle" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="posttitle" name="title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="topicdesc" class="form-label">Description</label>
-                        <textarea class="form-control" id="topicdesc" rows="5" name="desc" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <button class="btn btn-outline-dark" type="submit" >Add Post</button>
-                    </div>
+                <form action="http://localhost:3000/deletepost" method="POST">
+                    <div class="card">
+                        <div class="card-header">
+                          Are you sure you want to delete?
+                        </div>
+                        <div class="card-body">
+                          <h5 class="card-title"><%= post[0].topicname %></h5>
+                          <p class="card-text"><%= post[0].topicdetails %></p>
+                          <p><button type="submit" class="btn btn-outline-dark" name ="tid" value="<%= post[0].topicid %>">Yes</button>
+                          <button type="submit" class="btn btn-outline-danger" name="tid" value="No">No</button></p>
+                        </div>
+                      </div>
                 </form>
             </blockquote>
         </div>
