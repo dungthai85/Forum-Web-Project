@@ -30,7 +30,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active">Add post</a>
-                      </li>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Login</a>
                     </li>
@@ -39,20 +39,67 @@
         </div>
     </nav>
 
-    <div class="card">
+
+    <div class="card" style="display: block;">
         <div class="card-body">
-            <blockquote class="blockquote mb-0">
-                <form action="http://localhost:3000/deletepost" method="POST">
-                    <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title"><%= post[0].topicname %></h5>
-                          <p class="card-text"><%= post[0].topicdetails %></p>
-                        </div>
-                      </div>
-                </form>
-            </blockquote>
+            <h5 class="card-title">
+                <%= post[0].topicname %>
+                    <div class="dropdown" style="float: right;">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            <% var t=post[0].topicid %>
+                                <li><a class="nav-link" href="/editpost?topic=<%= t %>">Edit</a></li>
+                                <li><a class="nav-link" href="/deletepost?topic=<%= t %>">Delete</a></li>
+                        </ul>
+                    </div>
+            </h5>
+            <p class="card-text">
+                <%= post[0].topicdetails %>
+            </p>
+        </div>
+        <div class="card-footer text-muted">
+            <p style="font-size: small;"><a href="/addlike?like=like&topic=<%= post[0].topicid%>&page=curr">👍</a>
+                <%= post[0].points %> points by <a href="#" class="noline">
+                        <%= post[0].userid %>
+                    </a> | <a href="#" class="noline" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
+                        aria-controls="navbarNavDarkDropdown" aria-expanded="false">
+                        <%= post[0].comments %> comments
+                    </a>
+            </p>
+
+            <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                <div class="card">
+                    <div class="card-body">
+                        <blockquote class="blockquote mb-0">
+                            <form action="http://localhost:3000/addcomment?<%= [post[0].topicid, post[0].comments]  %>" method="POST">
+                                <div class="mb-3">
+                                    <label for="commdesc" class="form-label">Description</label>
+                                    <textarea class="form-control" id="commdesc" rows="5" name="desc"
+                                        required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <button class="btn btn-outline-dark" type="submit" name="tid" value="<%= [post[0].topicid, post[0].comments] %>">Add comment</button>
+                                </div>
+                            </form>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+
+    <% if (comments.length !== 0) { %>
+        <% for(var j = comments.length - 1; j >= 0; j--){ %>
+            <!-- To be changed later -->
+            <%= console.log(comments[j].commentdetails) %>
+        <% } %>
+    <% } %>
+
+
+
 </body>
 
 </html>

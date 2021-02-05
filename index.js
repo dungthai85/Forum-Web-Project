@@ -30,7 +30,6 @@ app.get('/', function (req, res) {
         if (err) throw err;
         res.render('../views/index', {topics : results});
     });
-    
 });
 
 // Renders the addpost page
@@ -51,24 +50,30 @@ app.get('/addlike', function (req, res) {
             if (err2) throw err2;
 
         });
-        res.redirect('/');
+
+        if(req.query.page === "home"){
+            res.redirect('/');
+        } else {
+            res.redirect(`comment?topic=${req.query.topic}`);
+        }
+        
     });
     
 });
 
 // Renders the editpost page
-app.get('/editpost.ejs', function (req, res) {
+app.get('/editpost', function (req, res) {
     //Query db for the topic to edit
     db.query(`SELECT * FROM TOPICS WHERE topicid = ${req.query.topic}`, (err, results) => {
         if (err) throw err;
         // console.log(results);
-        res.render('../views/editpost', {post: results});
+        res.render('../views/editpost.ejs', {post: results});
     });
     
 });
 
 // Renders the delete page
-app.get('/deletepost.ejs', function (req, res) {
+app.get('/deletepost', function (req, res) {
     //Query db for the delete post
     db.query(`SELECT * FROM TOPICS WHERE topicid = ${req.query.topic}`, (err, results) => {
         if (err) throw err;
@@ -79,15 +84,34 @@ app.get('/deletepost.ejs', function (req, res) {
 });
 
 // Renders the comments page
-app.get('/comment.ejs', function (req, res) {
-        //Query db for the topic comments
-        db.query(`SELECT * FROM TOPICS WHERE topicid = ${req.query.topic}`, (err, results) => {
-            if (err) throw err;
-            // console.log(results);
-            res.render('../views/comment', {post: results});
-        });
+app.get('/comment', function (req, res) {
+    //Query db for the topic comments
+    db.query(`SELECT * FROM TOPICS WHERE topicid = ${req.query.topic}`, (err, results) => {
+        if (err) throw err;
+        var comres = {};
+
+        if(results[0].comments !== 0){
+            db.query(`SELECT * FROM TOPICS WHERE topicid = ${req.query.topic}`, (err2, results2) => {
+                if (err2) throw err2;
+        
+                res.render('../views/comment', {post: results, comments: results2});
+            });
+        } else {
+            res.render('../views/comment', {post: results, comments : [] });
+        }
+        
+    });
 });
 
+// Renders add comments page
+// app.get('/addcomment', function (req, res) {
+//     //Query db for the topic comments
+//     db.query(`SELECT * FROM TOPICS WHERE topicid = ${req.query.topic}`, (err, results) => {
+//         if (err) throw err;
+
+//         res.render('../views/comment', {post: results});
+//     });
+// });
 // connection.end((err) => {
 //     console.log("Connection ended");
 //   });

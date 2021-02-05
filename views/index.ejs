@@ -42,24 +42,23 @@
   <% for (var i = topics.length - 1; i > 0; i--) {%>
     <div class="card" style="display: block;">
       <div class="card-body">
-        <h5 class="card-title"><a class="nav-link noline" href="/comment.ejs?topic=<%= topics[i].topicid%>"><%= topics.length - i %>. <%= topics[i].topicname %></a>
+        <h5 class="card-title"><a class="nav-link noline" href="/comment?topic=<%= topics[i].topicid%>"><%= topics.length - i %>. <%= topics[i].topicname %></a>
           <div class="dropdown" style="float: right;">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
               <% var t = topics[i].topicid %>
-              <li><a class="nav-link" href="/editpost.ejs?topic=<%= t %>" >Edit</a></li>
-              <li><a class="nav-link" href="/deletepost.ejs?topic=<%= t %>" >Delete</a></li>
+              <li><a class="nav-link" href="/editpost?topic=<%= t %>" >Edit</a></li>
+              <li><a class="nav-link" href="/deletepost?topic=<%= t %>" >Delete</a></li>
             </ul>
           </div>
         </h5>
-        <a class="nav-link noline" href="/comment.ejs?topic=<%= topics[i].topicid%>"><p class="card-text"><%= topics[i].topicdetails %></p></a>
+        <a class="nav-link noline" href="/comment?topic=<%= topics[i].topicid%>"><p class="card-text"><%= topics[i].topicdetails %></p></a>
       </div>
       <div class="card-footer text-muted">
-        <p style="font-size: small;"><a href="/addlike?like=like&topic=<%= topics[i].topicid%>">👍</a> <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].userid %></a> | <a href="/comment.ejs?topic=<%= topics[i].topicid%>" class="noline"><%= Object.keys(topics[i].comments).length %> comments</a></p>
+        <p style="font-size: small;"><a href="/addlike?like=like&topic=<%= topics[i].topicid%>&page=home">👍</a> <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].userid %></a> | <a href="/comment?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
       </div>
     </div>
-  </a>
     <% } %>
 </body>
 
