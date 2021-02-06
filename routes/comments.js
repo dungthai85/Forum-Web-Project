@@ -12,19 +12,15 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.get('/comment', function (req, res) {
     var topicid = req.query.topic;
     if(topicid){
-        var topic2 = "th" + topicid;
-        var query = `SELECT * FROM TOPICS WHERE topicid = ? ;  SELECT * FROM ${topic2}`;
+        var query = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT * FROM COMMENTS WHERE topicid = ${topicid};`;
         db.query(query, [topicid]).then(row => {
-            console.table(row[0][0]);
-            console.table(row[0][1]);
-            if(row[0][0].comments !== 0){
-                res.render('../views/comment', {post: row[0][0], comments : row[0][1] });
-            } else {
-                res.render('../views/comment', {post: row[0], comments : {} });
-            }
+
+            res.render('../views/comment', {post: row[0][0], comments : row[0][1] });  
+
         }).catch(err => {
             console.log(err);
         })
+
     }
 
 });
@@ -32,27 +28,52 @@ router.get('/comment', function (req, res) {
 // addcomment  endpoint to add coment topic
 router.post('/addcomment', function (req, res) {
 
-    var arr = req.body.tid.split(',');
+    var arr = req.body.tid;
 
-            //only create table if it is zero comments
-            if (arr[1] === '0') {
-                var sql1 = `CREATE TABLE th${arr[0]} (commentid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, userid INT NOT NULL, commentdetails TEXT(6000) NOT NULL, posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
-                db.query(sql1, function (err1, result1) {
+            query = `INSERT INTO COMMENTS (topicid, userid, commentdetails, posted, points) VALUES ('${arr}', 10, '${req.body.desc}', NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = '${arr}';`;
+            db.query(query).then(row =>{
+                res.redirect(`/comment?topic=${arr}`);
 
-                });
-            }
+            }).catch(err => {
+                console.log(err);
+            })
+    
+});
 
-            // query = `INSERT INTO th${arr[0]} (userid, commentdetails, posted) VALUES (10, '${req.body.desc}', NOW())`;
+router.get('/editcomment', function (req, res) {
+    var commentid = req.query.topic;
+    if (commentid) {
+        //Query db for the topic to edit
+        db.query(`SELECT * FROM COMMENTS WHERE commentid = ?`, [commentid])
+            .then(rows => {
+                res.render('../views/editcomment.ejs', { comment: rows[0] });
+        });
+    } else {
+        res.sendStatus(500);
+    }
 
-            // db.query(`SELECT * FROM th${arr[0]}`, function(err3, result3){
-            //     var count = result3.length;
-            //     db.query(`UPDATE TOPICS SET comments = '${count + 1}' WHERE topicid = ${arr[0]}`, function (err, result) {
+});
 
-            //     });
-            // });
+// edit comment  endpoint to edit coment topic
+router.post('/editcomment', function (req, res) {
 
+    var commentdetals = req.body.desc;
+    var commentid = req.body.tid;
+    if (commentdetals && commentid){
+        //Query to edit the post
+        query = `UPDATE COMMENTS SET commentdetails = ? WHERE commentid = ?`;
+        db.query(query, [commentdetals, commentid])
+            .then((rows, err) => {
+                if(err){
+                    console.log(err.code);
+                }
+    });
 
-    res.redirect(`/comment?topic=${arr[0]}`);
+    res.redirect('/');
+    } else {
+        res.sendStatus(500);
+    }
+    // ; UPDATE TOPICS SET comments = comments-1 WHERE topicid = '${topicid}';
 
 });
 

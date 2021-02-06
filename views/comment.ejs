@@ -73,14 +73,14 @@
                 <div class="card">
                     <div class="card-body">
                         <blockquote class="blockquote mb-0">
-                            <form action="http://localhost:3000/addcomment?<%= [post[0].topicid, post[0].comments]  %>" method="POST">
+                            <form action="http://localhost:3000/addcomment?<%= [post[0].topicid]  %>" method="POST">
                                 <div class="mb-3">
                                     <label for="commdesc" class="form-label">Description</label>
                                     <textarea class="form-control" id="commdesc" rows="5" name="desc"
                                         required></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <button class="btn btn-outline-dark" type="submit" name="tid" value="<%= [post[0].topicid, post[0].comments] %>">Add comment</button>
+                                    <button class="btn btn-outline-dark" type="submit" name="tid" value="<%= [post[0].topicid] %>">Add comment</button>
                                 </div>
                             </form>
                         </blockquote>
@@ -93,9 +93,22 @@
 
     <% if (comments.length !== 0) { %>
         <% for(var j = comments.length - 1; j >= 0; j--){ %>
-            <!-- To be changed later -->
-
-            <p><%= comments[j].commentdetails %></p>
+            <div class="card" style="display: block;">
+                <div class="card-body">
+                    <div class="dropdown" style="float: right;">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                        <% var t = comments[j].commentid %>
+                        <li><a class="nav-link" href="/editcomment?topic=<%= t %>" >Edit</a></li>
+                        <li><a class="nav-link" href="/deletecomment?topic=<%= t %>" >Delete</a></li>
+                      </ul>
+                    </div>
+                  </h5>
+               <p class="card-text"><%= comments.length - j %>. <%= comments[j].commentdetails %></p>
+               <p style="font-size: small;"> <%= comments[j].points %> points by <a href="#" class="noline"><%= comments[j].userid %></a> | </p>
+                </div>
+              </div>
         <% } %>
     <% } %>
 

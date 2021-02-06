@@ -120,25 +120,14 @@ router.get('/addlike', function (req, res) {
 
     if (topicid) {
         //Query to get the row
-        var query1 = `SELECT * FROM TOPICS WHERE topicid = ? `;
+        var query1 = `UPDATE TOPICS SET points = points + 1 WHERE topicid = ? `;
         db.query(query1, [topicid])
             .then(rows => {
-                var points = rows[0][0].points + 1;
-
-                //Second query to update the points
-                var query2 = `UPDATE TOPICS SET points = ? WHERE topicid = ? `;
-                db.query(query2, [points, topicid]).then(rows => {
-
-                }).catch(err => {
-                    console.log(err.code);
-                });
-
                 if (req.query.page === "home") {
                     res.redirect('/');
                 } else {
                     res.redirect(`comment?topic=${topicid}`);
                 }
-
             }).catch(err => {
                 console.log(err.code);
             });
