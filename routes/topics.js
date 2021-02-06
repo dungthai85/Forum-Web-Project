@@ -17,7 +17,7 @@ router.get('/', function (req, res) {
             if(err) {
                 console.log(err.code);
             }
-            console.table(rows[0]);
+            // console.table(rows[0]);
             res.render('../views/index', {topics : rows[0]});
     });
 });

@@ -51,7 +51,7 @@
                         <textarea class="form-control" id="topicdesc" rows="5" name="desc" required><%= comment[0].commentdetails %></textarea>
                     </div>
                     <div class="mb-3">
-                        <button class="btn btn-outline-dark" type="submit" name ="tid" value="<%= comment[0].commentid + ', ' + comment[0].topicid %>">Edit Comment</button>
+                        <button class="btn btn-outline-dark" type="submit" name ="tid" value="<%= comment[0].topicid %>,<%= comment[0].commentid %>">Edit Comment</button>
                     </div>
                 </form>
             </blockquote>

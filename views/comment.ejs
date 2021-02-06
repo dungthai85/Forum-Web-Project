@@ -100,8 +100,9 @@
                       </button>
                       <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                         <% var t = comments[j].commentid %>
-                        <li><a class="nav-link" href="/editcomment?topic=<%= t %>" >Edit</a></li>
-                        <li><a class="nav-link" href="/deletecomment?topic=<%= t %>" >Delete</a></li>
+                        <% var s = comments[j].topicid %>
+                        <li><a class="nav-link" href="/editcomment?topic=<%= s %>,<%= t %>" >Edit</a></li>
+                        <li><a class="nav-link" href="/deletecomment?topic=<%= s %>,<%= t %>" >Delete</a></li>
                       </ul>
                     </div>
                   </h5>
