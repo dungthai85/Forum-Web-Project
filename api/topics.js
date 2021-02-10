@@ -29,12 +29,13 @@ router.get('/addpost', validateToken, function (req, res) {
 router.post('/addpost', validateToken, function (req, res) {
     if (req.user !== undefined) {
         var userid = req.user.id;
+        var username = req.user.username;
         var topictitle = req.body.title;
         var topicdesc = req.body.desc;
         if (topictitle && topicdesc) {
             //Query to add post
-            var query = `INSERT INTO TOPICS (userid, topicname, topicdetails, points, posted, comments) VALUES ( ? , ? , ? , 0, NOW(), 0)`;
-            db.query(query, [userid, topictitle, topicdesc])
+            var query = `INSERT INTO TOPICS (userid, username, topicname, topicdetails, points, posted, comments) VALUES ( ? , ?, ? , ? , 0, NOW(), 0)`;
+            db.query(query, [userid, username, topictitle, topicdesc])
                 .then((rows, err) => {
                     if (err) {
                         console.log(err.code);
@@ -104,7 +105,7 @@ router.get('/deletepost', validateToken, function (req, res) {
                     console.log(err.code);
                 }
                 // console.log(results);
-                res.render('../views/deletepost', { post: rows[0] });
+                res.render('../views/deletepost', { post: rows[0], user: req.user });
             });
         }
     } else {

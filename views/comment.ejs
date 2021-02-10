@@ -15,32 +15,8 @@
 
 <body>
     <!-- page content -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/api/topics">Forum Web Project</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/api/topics">Home</a>
-                    </li>
-                    <% if(Object.keys(user).length === 0) {  %>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/login">Login</a>
-                        </li>
-                      <% } else { %>
-                        <li class="nav-item">
-                          <a class="nav-link" href="/api/topics/addpost">Add post</a>
-                        </li>
-                      <% } %>
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <!-- THE NAV BAR WITH LOGIN -->
+  <%- include('navBar'); -%>
 
 
     <div class="card" style="display: block;">
@@ -67,13 +43,14 @@
         <div class="card-footer text-muted">
             <p style="font-size: small;"><a href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&page=curr">👍</a>
                 <%= post[0].points %> points by <a href="#" class="noline">
-                        <%= post[0].userid %>
+                        <%= post[0].username %>
                     </a> | <a href="#" class="noline" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
                         aria-controls="navbarNavDarkDropdown" aria-expanded="false">
                         <%= post[0].comments %> comments
                     </a>
             </p>
 
+            <% if (user !== undefined) { %>
             <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
                 <div class="card">
                     <div class="card-body">
@@ -92,6 +69,7 @@
                     </div>
                 </div>
             </div>
+            <% } %>
 
         </div>
     </div>
@@ -100,6 +78,7 @@
         <% for(var j = comments.length - 1; j >= 0; j--){ %>
             <div class="card" style="display: block;">
                 <div class="card-body">
+                    <% if(user !== undefined && comments[j].userid === user.id ) { %>
                     <div class="dropdown" style="float: right;">
                       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
                       </button>
@@ -110,9 +89,10 @@
                         <li><a class="nav-link" href="/api/comments/deletecomment?topic=<%= s %>,<%= t %>" >Delete</a></li>
                       </ul>
                     </div>
+                    <% } %>
                   </h5>
                <p class="card-text"><%= comments.length - j %>. <%= comments[j].commentdetails %></p>
-               <p style="font-size: small;"> <%= comments[j].points %> points by <a href="#" class="noline"><%= comments[j].userid %></a> | </p>
+               <p style="font-size: small;"> <%= comments[j].points %> points by <a href="#" class="noline"><%= comments[j].username %></a> | </p>
                 </div>
               </div>
         <% } %>

@@ -5,18 +5,14 @@ const validateToken = require('../utilities/validateToken');
 
 // Renders the comments page
 router.get('/', validateToken, function (req, res) {
-    if (req.user) {
-        var topicid = req.query.topic;
-        if (topicid) {
-            var query = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT * FROM COMMENTS WHERE topicid = ?;`;
-            db.query(query, [topicid, topicid]).then(row => {
-                res.render('../views/comment', { post: row[0][0], comments: row[0][1], user: req.user });
-            }).catch(err => {
-                console.log(err);
-            })
-        }
-    } else {
-        res.redirect('/login');
+    var topicid = req.query.topic;
+    if (topicid) {
+        var query = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT * FROM COMMENTS WHERE topicid = ?;`;
+        db.query(query, [topicid, topicid]).then(row => {
+            res.render('../views/comment', { post: row[0][0], comments: row[0][1], user: req.user });
+        }).catch(err => {
+            console.log(err);
+        })
     }
 });
 
@@ -24,11 +20,12 @@ router.get('/', validateToken, function (req, res) {
 router.post('/addcomment', validateToken, function (req, res) {
     if (req.user) {
         var arr = req.body.tid;
-
-        query = `INSERT INTO COMMENTS (topicid, userid, commentdetails, posted, points) VALUES ('${arr}', 10, "${req.body.desc}", NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = '${arr}';`;
-        db.query(query).then(row => {
+        var userid = req.user.id;
+        var username = req.user.username;
+        var comment = req.body.desc;
+        query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = '${arr}';`;
+        db.query(query, [arr, userid, username, comment]).then(row => {
             res.redirect(`/api/comments/?topic=${arr}`);
-
         }).catch(err => {
             console.log(err);
         })
@@ -44,7 +41,7 @@ router.get('/editcomment', validateToken, function (req, res) {
             //Query db for the topic to edit
             db.query(`SELECT * FROM COMMENTS WHERE commentid = ?`, [commentid[1]])
                 .then(rows => {
-                    res.render('../views/editcomment.ejs', { comment: rows[0] });
+                    res.render('../views/editcomment.ejs', { comment: rows[0], user: req.user });
                 });
         } else {
             res.sendStatus(500);
