@@ -26,12 +26,16 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page">Home</a>
-            <li class="nav-item">
-              <a class="nav-link" href="/api/topics/addpost">Add post</a>
             </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/login">Login</a>
-          </li>
+            <% if(Object.keys(user).length === 0) {  %>
+              <li class="nav-item">
+                  <a class="nav-link" href="/login">Login</a>
+              </li>
+            <% } else { %>
+              <li class="nav-item">
+                <a class="nav-link" href="/api/topics/addpost">Add post</a>
+              </li>
+            <% } %>
         </ul>
       </div>
     </div>
@@ -43,6 +47,7 @@
     <div class="card" style="display: block;">
       <div class="card-body">
         <h5 class="card-title"><a class="nav-link noline" href="/api/comments/?topic=<%= topics[i].topicid%>"><%= topics.length - i %>. <%= topics[i].topicname %></a>
+          <% if(topics[i].userid === user.guid ) { %>
           <div class="dropdown" style="float: right;">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
             </button>
@@ -52,11 +57,12 @@
               <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>" >Delete</a></li>
             </ul>
           </div>
+          <% } %>
         </h5>
         <a class="nav-link noline" href="/api/comments/?topic=<%= topics[i].topicid%>"><p class="card-text"><%= topics[i].topicdetails %></p></a>
       </div>
       <div class="card-footer text-muted">
-        <p style="font-size: small;"><a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&page=home">👍</a> <%= topics[i].points %> points by <a href="#" class="noline"><%= user.firstName %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
+        <p style="font-size: small;"><a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&page=home">👍</a> <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].userid %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
       </div>
     </div>
     <% } %>

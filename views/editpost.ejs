@@ -28,12 +28,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/api/topics">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/api/topics/addpost">Add post</a>
-                      </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
+                    <% if(Object.keys(user).length === 0) {  %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login">Login</a>
+                        </li>
+                      <% } else { %>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/api/topics/addpost">Add post</a>
+                        </li>
+                      <% } %>
                 </ul>
             </div>
         </div>

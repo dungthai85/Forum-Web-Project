@@ -28,12 +28,15 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/api/topics">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/api/topics/addpost">Add post</a>
-                      </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
+                    <% if(Object.keys(user).length === 0) {  %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login">Login</a>
+                        </li>
+                      <% } else { %>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/api/topics/addpost">Add post</a>
+                        </li>
+                      <% } %>
                 </ul>
             </div>
         </div>
@@ -44,6 +47,7 @@
         <div class="card-body">
             <h5 class="card-title">
                 <%= post[0].topicname %>
+                <% if(post[0].userid === user.guid ) { %>
                     <div class="dropdown" style="float: right;">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -54,6 +58,7 @@
                                 <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>">Delete</a></li>
                         </ul>
                     </div>
+                    <% } %>
             </h5>
             <p class="card-text">
                 <%= post[0].topicdetails %>

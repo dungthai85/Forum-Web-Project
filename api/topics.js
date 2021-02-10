@@ -7,21 +7,19 @@ const db = require('../utlities/mysqlconn');
 // Renders the index page
 router.get('/', function (req, res) {
 
-    
-
-    if (req.cookies.access_token !== undefined) {
         //Query db to open all of the posts
         db.query('SELECT * FROM TOPICS')
         .then((rows, err) =>{
             if(err) {
                 console.log(err.code);
             }
-            // console.table(rows[0]);
-            res.render('../views/index', {topics : rows[0], user: req.cookies.access_token });
+            if (req.cookies.access_token !== undefined) {
+                res.render('../views/index', {topics : rows[0], user: req.cookies.access_token });
+            } else {
+                res.render('../views/index', {topics : rows[0], user: {} });
+            }
         });
-    } else {
-        res.redirect('/login');
-    }
+
 
 });
 
@@ -57,7 +55,7 @@ router.post('/addpost', function (req, res) {
             res.sendStatus(500);
         }
     } else {
-        res.redirect('/login');
+        
     }
 
 
@@ -71,7 +69,11 @@ router.get('/editpost', function (req, res) {
         var query = `SELECT * FROM TOPICS WHERE topicid = ?`;
         db.query(query, [topicid])
             .then(rows => {
-                res.render('../views/editpost.ejs', { post: rows[0] });
+                if (req.cookies.access_token !== undefined) {
+                    res.render('../views/editpost.ejs', { post: rows[0], user: req.cookies.access_token });
+                } else {
+                    res.render('../views/editpost.ejs', { post: rows[0], user: {} });
+                }
         });
     } else {
         res.sendStatus(500);

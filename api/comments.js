@@ -8,8 +8,11 @@ router.get('/', function (req, res) {
     if(topicid){
         var query = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT * FROM COMMENTS WHERE topicid = ?;`;
         db.query(query, [topicid, topicid]).then(row => {
-
-            res.render('../views/comment', {post: row[0][0], comments : row[0][1] });  
+            if (req.cookies.access_token !== undefined) {
+                res.render('../views/comment', {post: row[0][0], comments : row[0][1], user: req.cookies.access_token });
+            } else {
+                res.render('../views/comment', {post: row[0][0], comments : row[0][1], user: {} });
+            }
 
         }).catch(err => {
             console.log(err);

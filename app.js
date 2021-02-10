@@ -5,6 +5,7 @@ const rp = require('request-promise');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session)
+const jwt = require('jsonwebtoken');
 
 const parseXML = require('xml2js').parseString;
 
@@ -24,23 +25,6 @@ app.use(express.json());
 
 // requests parses cookies
 app.use(cookieParser());
-
-// app.use(session({
-//     secret: process.env.COOKIE_SECRET,
-//     saveUninitialized: true,
-//     resave: true,
-//     cookie: {
-//         path: '/',
-//         httpOnly: true,
-//         secure: true,
-//         sameSite: true,
-//         maxAge: 600000
-//     },
-//     store: new MemoryStore({
-//         checkPeriod: 3600000 // prune expired entries every hour
-//       }),
-//     resave:false
-// }));
 
 // Setting the view for ejs
 app.set('view engine', 'ejs');
@@ -75,7 +59,7 @@ app.get('/sa/signin/callback', async function (req, res) {
         let generate = await rp(options);
         let profile = await getUser(generate, req.query.auth_server_url);
 
-        // console.log(profile);
+        // let token = jwt.sign(profile, process.env.CLIENT_SECRET);
 
         res.cookie('access_token', profile, {
             maxAge: 600000,
@@ -83,19 +67,6 @@ app.get('/sa/signin/callback', async function (req, res) {
         })
 
         res.redirect('/api/topics');
-
-        // rp(options)
-        //     .then(function (parsedBody) {
-
-        //         //Get User Profile
-
-        //     let profile = await getUser(parsedBody, req.query.auth_server_url, res);
-
-
-        //     })
-        //     .catch(function (err) {
-        //         console.log(err);
-        //     });
 
     } catch (error) {
 
