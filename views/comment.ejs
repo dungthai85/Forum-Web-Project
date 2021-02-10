@@ -47,7 +47,7 @@
         <div class="card-body">
             <h5 class="card-title">
                 <%= post[0].topicname %>
-                <% if(post[0].userid === user.guid ) { %>
+                <% if(user !== undefined && post[0].userid === user.id ) { %>
                     <div class="dropdown" style="float: right;">
                         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
                             data-bs-toggle="dropdown" aria-expanded="false">

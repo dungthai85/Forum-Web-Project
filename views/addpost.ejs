@@ -28,14 +28,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/api/topics">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page">Add post</a>
-                      </li>
                       <% if(!uid) {  %>
                         <li class="nav-item">
                             <a class="nav-link" href="/login">Login</a>
                         </li>
-                    <% } %>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page">Add post</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link">Log Out</a>
+                          </li>
+                        <% } %>
                 </ul>
             </div>
         </div>

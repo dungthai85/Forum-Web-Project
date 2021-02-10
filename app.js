@@ -3,23 +3,18 @@ const app = express();
 const dotenv = require('dotenv');
 const rp = require('request-promise');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const MemoryStore = require('memorystore')(session)
-const jwt = require('jsonwebtoken');
 
 const parseXML = require('xml2js').parseString;
-
 
 dotenv.config({ path: './.env' });
 
 const bodyParser = require('body-parser');
 
-var topicrouter = require('./api/topics');
-var commentrouter = require('./api/comments');
-const { request } = require('express');
+let generateToken = require('./utilities/generateToken');
 
 // urlencoded to help extract data from form
 app.use(bodyParser.urlencoded({ extended: false }));
+
 // parses json body sent by api clients
 app.use(express.json());
 
@@ -31,6 +26,9 @@ app.set('view engine', 'ejs');
 
 // Making the css folder static to be accessable by ejs page
 app.use('/css', express.static('css'));
+
+var topicrouter = require('./api/topics');
+var commentrouter = require('./api/comments');
 
 // Renders the login page
 app.get('/login', function (req, res) {
@@ -55,21 +53,19 @@ app.get('/sa/signin/callback', async function (req, res) {
         }
 
         //Generate access token
-
         let generate = await rp(options);
         let profile = await getUser(generate, req.query.auth_server_url);
 
-        // let token = jwt.sign(profile, process.env.CLIENT_SECRET);
-
-        res.cookie('access_token', profile, {
-            maxAge: 600000,
-            httpOnly: true
-        })
+        //adding expiration to the token
+        profile.exp = Math.floor(Date.now() / 1000) + (60 * 60);
+        
+        // Creating a token to store in cookie
+        await generateToken(res, profile);
 
         res.redirect('/api/topics');
 
     } catch (error) {
-
+        console.log("Could not sign in");
     }
 
 });
@@ -89,14 +85,6 @@ async function getUser(parsed, url) {
     let generate = await rp(options);
     let profile = await extractProfileInfo(generate, json.access_token);
     return profile;
-
-    // rp(options)
-    //     .then(response => {
-    //         let profile = extractProfileInfo(response, json.access_token);
-    //         //You now have readable user profile information as a JSON object in 'profile'
-    //         console.log(profile);
-
-    //     });
 }
 
 function extractProfileInfo(body, accessToken) {
@@ -140,15 +128,6 @@ function extractProfileInfo(body, accessToken) {
     });
 }
 
-// function validateCookie(req, res, next){
-//     const { cookies } = req;
-//     if('session_id' in cookies){
-//         console.log("there is a session id");
-//         if(cookies.session_id == )
-//     }
-//     console.log(cookies);
-//     next();
-// }
 
 
 // Routes to add, edit, and delete topics
