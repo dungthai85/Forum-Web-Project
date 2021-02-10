@@ -17,7 +17,7 @@
     <!-- page content -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Forum Web Project</a>
+            <a class="navbar-brand" href="/api/topics">Forum Web Project</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -26,13 +26,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="/api/topics">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active">Add post</a>
-                    </li>
+                        <a class="nav-link" href="/api/topics/addpost">Add post</a>
+                      </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Login</a>
+                        <a class="nav-link" href="/login">Login</a>
                     </li>
                 </ul>
             </div>
@@ -50,8 +50,8 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                             <% var t=post[0].topicid %>
-                                <li><a class="nav-link" href="/editpost?topic=<%= t %>">Edit</a></li>
-                                <li><a class="nav-link" href="/deletepost?topic=<%= t %>">Delete</a></li>
+                                <li><a class="nav-link" href="/api/topics/editpost?topic=<%= t %>">Edit</a></li>
+                                <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>">Delete</a></li>
                         </ul>
                     </div>
             </h5>
@@ -60,7 +60,7 @@
             </p>
         </div>
         <div class="card-footer text-muted">
-            <p style="font-size: small;"><a href="/addlike?like=like&topic=<%= post[0].topicid%>&page=curr">👍</a>
+            <p style="font-size: small;"><a href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&page=curr">👍</a>
                 <%= post[0].points %> points by <a href="#" class="noline">
                         <%= post[0].userid %>
                     </a> | <a href="#" class="noline" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
@@ -73,7 +73,7 @@
                 <div class="card">
                     <div class="card-body">
                         <blockquote class="blockquote mb-0">
-                            <form action="http://localhost:3000/addcomment?<%= [post[0].topicid]  %>" method="POST">
+                            <form action="http://localhost:3000/api/comments/addcomment?<%= [post[0].topicid]  %>" method="POST">
                                 <div class="mb-3">
                                     <label for="commdesc" class="form-label">Description</label>
                                     <textarea class="form-control" id="commdesc" rows="5" name="desc"
@@ -101,8 +101,8 @@
                       <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                         <% var t = comments[j].commentid %>
                         <% var s = comments[j].topicid %>
-                        <li><a class="nav-link" href="/editcomment?topic=<%= s %>,<%= t %>" >Edit</a></li>
-                        <li><a class="nav-link" href="/deletecomment?topic=<%= s %>,<%= t %>" >Delete</a></li>
+                        <li><a class="nav-link" href="/api/comments/editcomment?topic=<%= s %>,<%= t %>" >Edit</a></li>
+                        <li><a class="nav-link" href="/api/comments/deletecomment?topic=<%= s %>,<%= t %>" >Delete</a></li>
                       </ul>
                     </div>
                   </h5>
