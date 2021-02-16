@@ -16,100 +16,90 @@ router.get('/', validateToken, function (req, res) {
     }
 });
 
-// addcomment  endpoint to add coment topic
-router.post('/addcomment', validateToken, function (req, res) {
+router.use(async (req, res, next) => {
+    await validateToken(req, res, next);
     if (req.token) {
-        var arr = req.body.tid;
-        var userid = req.user.id;
-        var username = req.user.username;
-        var comment = req.body.desc;
-        query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = '${arr}';`;
-        db.query(query, [arr, userid, username, comment]).then(row => {
-            res.redirect(`/api/comments/?topic=${arr}`);
-        }).catch(err => {
-            console.log(err);
-        })
+        console.log("VALID TOKEN");
     } else {
+        console.log("No Token, Redirecting to login");
         res.redirect('/login');
     }
 });
 
-router.get('/editcomment', validateToken, function (req, res) {
-    if (req.token) {
-        var commentid = req.query.topic.split(',');
-        if (commentid) {
-            //Query db for the topic to edit
-            db.query(`SELECT * FROM COMMENTS WHERE commentid = ?`, [commentid[1]])
-                .then(rows => {
-                    res.render('../views/editcomment.ejs', { comment: rows[0], user: req.user });
-                });
-        } else {
-            res.sendStatus(500);
-        }
+// addcomment  endpoint to add coment topic
+router.post('/addcomment', function (req, res) {
+    var arr = req.body.tid;
+    var userid = req.user.id;
+    var username = req.user.username;
+    var comment = req.body.desc;
+    query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = '${arr}';`;
+    db.query(query, [arr, userid, username, comment]).then(row => {
+        res.redirect(`/api/comments/?topic=${arr}`);
+    }).catch(err => {
+        console.log(err);
+    })
+});
+
+router.get('/editcomment', function (req, res) {
+    var commentid = req.query.topic.split(',');
+    if (commentid) {
+        //Query db for the topic to edit
+        db.query(`SELECT * FROM COMMENTS WHERE commentid = ?`, [commentid[1]])
+            .then(rows => {
+                res.render('../views/editcomment.ejs', { comment: rows[0], user: req.user });
+            });
     } else {
-        res.redirect('/login');
+        res.sendStatus(500);
     }
 });
 
 // edit comment  endpoint to edit coment topic
-router.post('/editcomment', validateToken, function (req, res) {
-    if (req.token) {
-        var commentdetals = req.body.desc;
-        var commentid = req.body.tid.split(',');
-        if (commentdetals && commentid) {
-            //Query to edit the post
-            query = `UPDATE COMMENTS SET commentdetails = ? WHERE commentid = ?`;
-            db.query(query, [commentdetals, commentid[1]])
-                .then((rows, err) => {
-                    if (err) {
-                        console.log(err.code);
-                    }
-                    res.redirect(`/api/comments/?topic=${commentid[0]}`);
-                });
-        } else {
-            res.sendStatus(500);
-        }
+router.post('/editcomment', function (req, res) {
+    var commentdetals = req.body.desc;
+    var commentid = req.body.tid.split(',');
+    if (commentdetals && commentid) {
+        //Query to edit the post
+        query = `UPDATE COMMENTS SET commentdetails = ? WHERE commentid = ?`;
+        db.query(query, [commentdetals, commentid[1]])
+            .then((rows, err) => {
+                if (err) {
+                    console.log(err.code);
+                }
+                res.redirect(`/api/comments/?topic=${commentid[0]}`);
+            });
     } else {
-        res.redirect('/login');
+        res.sendStatus(500);
     }
 });
 
 // delete endpoint to delete comment
-router.get('/deletecomment', validateToken, function (req, res) {
-    if (req.token) {
-        var commentid = req.query.topic.split(',');
-        if (commentid) {
-            //Query db for the delete post
-            var sql = `DELETE FROM COMMENTS WHERE commentid = ?; UPDATE TOPICS SET comments = comments - 1 WHERE topicid = ? `;
-            db.query(sql, [commentid[1], commentid[0]]).then((rows, err) => {
-                if (err) {
-                    console.log(err.code);
+router.get('/deletecomment', function (req, res) {
+    var commentid = req.query.topic.split(',');
+    if (commentid) {
+        //Query db for the delete post
+        var sql = `DELETE FROM COMMENTS WHERE commentid = ?; UPDATE TOPICS SET comments = comments - 1 WHERE topicid = ? `;
+        db.query(sql, [commentid[1], commentid[0]]).then((rows, err) => {
+            if (err) {
+                console.log(err.code);
 
-                }
-                res.redirect(`/api/comments/?topic=${commentid[0]}`);
-            });
-        }
-    } else {
-        res.redirect('/login');
+            }
+            res.redirect(`/api/comments/?topic=${commentid[0]}`);
+        });
     }
 });
 
 // Increment comment like
-router.get('/commentlike', validateToken, function (req, res) {
-    if (req.token) {
-        var topicid = req.query.topic;
-        if (topicid) {
-            //Query to get the row
-            var query = `UPDATE COMMENTS SET points = points + 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?`;
-            db.query(query, [topicid, topicid])
-                .then(rows => {
-                    res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}`);
-                }).catch(err => {
-                    console.log(err.code);
-                });
-        }
-    } else {
-        res.redirect('/login');
+router.get('/commentlike', function (req, res) {
+    var topicid = req.query.topic;
+    if (topicid) {
+        //Query to get the row
+        var query = `UPDATE COMMENTS SET points = points + 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?`;
+        db.query(query, [topicid, topicid])
+            .then(rows => {
+                res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}`);
+            }).catch(err => {
+                console.log(err.code);
+            });
     }
 });
 

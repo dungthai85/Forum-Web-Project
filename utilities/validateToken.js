@@ -4,7 +4,7 @@ let validateToken = async function (req, res, next) {
     const token = req.cookies.access_token || '';
     try {
         if (!token){
-            console.log("You need to Login!!");
+            console.log("You need to Login to create a post or comment!");
         } else {
             const decrypt = await jwt.verify(token, process.env.CLIENT_SECRET);
             req.token = true;
@@ -19,7 +19,10 @@ let validateToken = async function (req, res, next) {
         next();
     } catch (err) {
         req.token = false;
-        console.log("Invalid token!!");
+        console.log("Invalid token!");
+        res.status(500).send({
+            message: "Invalid token!"
+        });
     }
 };
 

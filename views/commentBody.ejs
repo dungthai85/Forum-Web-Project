@@ -1,0 +1,85 @@
+<div class="card" style="display: block;">
+    <div class="card-body">
+        <h5 class="card-title">
+            <%= post[0].topicname %>
+            <% if(user !== undefined && post[0].userid === user.id ) { %>
+                <div class="dropdown" style="float: right;">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                        <% var t=post[0].topicid %>
+                            <li><a class="nav-link" href="/api/topics/editpost?topic=<%= t %>">Edit</a></li>
+                            <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>">Delete</a></li>
+                    </ul>
+                </div>
+                <% } %>
+        </h5>
+        <p class="card-text">
+            <%= post[0].topicdetails %>
+        </p>
+    </div>
+    <div class="card-footer text-muted">
+        <p style="font-size: small;">
+            <% if (user !== undefined && post[0].userid !== user.id) { %>
+            <a href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&page=curr">👍</a>
+            <% } %>
+            <%= post[0].points %> points by <a href="#" class="noline">
+                    <%= post[0].username %>
+                </a> | <a href="#" class="noline" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
+                    aria-controls="navbarNavDarkDropdown" aria-expanded="false">
+                    <%= post[0].comments %> comments
+                </a>
+        </p>
+
+        <% if (user !== undefined) { %>
+        <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+            <div class="card">
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <form action="http://localhost:3000/api/comments/addcomment?<%= [post[0].topicid]  %>" method="POST">
+                            <div class="mb-3">
+                                <label for="commdesc" class="form-label">Description</label>
+                                <textarea class="form-control" id="commdesc" rows="5" name="desc"
+                                    required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <button class="btn btn-outline-dark" type="submit" name="tid" value="<%= [post[0].topicid] %>">Add comment</button>
+                            </div>
+                        </form>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+    </div>
+</div>
+
+<% if (comments.length !== 0) { %>
+    <% for(var j = comments.length - 1; j >= 0; j--){ %>
+        <div class="card" style="display: block;">
+            <div class="card-body">
+                <% if(user !== undefined && comments[j].userid === user.id ) { %>
+                <div class="dropdown" style="float: right;">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <% var t = comments[j].commentid %>
+                    <% var s = comments[j].topicid %>
+                    <li><a class="nav-link" href="/api/comments/editcomment?topic=<%= s %>,<%= t %>" >Edit</a></li>
+                    <li><a class="nav-link" href="/api/comments/deletecomment?topic=<%= s %>,<%= t %>" >Delete</a></li>
+                  </ul>
+                </div>
+                <% } %>
+              </h5>
+           <p class="card-text"><%= comments.length - j %>. <%= comments[j].commentdetails %></p>
+           <p style="font-size: small;">
+            <% if (user !== undefined && comments[j].userid !== user.id) { %>
+            <a href="/api/comments/commentlike?like=like&topic=<%= comments[j].commentid%>&page=curr">👍</a> 
+            <% } %>
+            <%= comments[j].points %> points by <a href="#" class="noline"><%= comments[j].username %></a> | </p>
+            </div>
+          </div>
+    <% } %>
+<% } %>
