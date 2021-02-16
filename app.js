@@ -49,7 +49,7 @@ app.use('/api/comments', commentrouter);
 
 app.get('/', function (req, res) {
     console.log("Hello we are on main page");
-    res.send("HELLO THIS WORKS");
+    res.sendStatus(404);
 })
 
 // Opens server to listen to port 3000
