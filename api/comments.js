@@ -32,8 +32,8 @@ router.post('/addcomment', function (req, res) {
     var userid = req.user.id;
     var username = req.user.username;
     var comment = req.body.desc;
-    query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = '${arr}';`;
-    db.query(query, [arr, userid, username, comment]).then(row => {
+    query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = ?;`;
+    db.query(query, [arr, userid, username, comment, arr]).then(row => {
         res.redirect(`/api/comments/?topic=${arr}`);
     }).catch(err => {
         console.log(err);

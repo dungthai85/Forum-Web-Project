@@ -21,6 +21,8 @@ app.set('view engine', 'ejs');
 // Making the css folder static to be accessable by ejs page
 app.use('/css', express.static('css'));
 
+console.log("STARTING SERVER");
+
 var topicrouter = require('./api/topics');
 var commentrouter = require('./api/comments');
 var sa = require('./api/signin');
