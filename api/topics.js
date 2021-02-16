@@ -7,12 +7,16 @@ const validateToken = require('../utilities/validateToken');
 // Renders the index page
 router.get('/', validateToken, function (req, res) {
     //Query db to open all of the posts
+    console.log("Trying to connect");
     db.query('SELECT * FROM TOPICS')
         .then((rows, err) => {
             if (err) {
                 console.log(err.code);
             }
             res.render('../views/index', { topics: rows[0], user: req.user });
+        }).catch(err => {
+            console.log("Could Not Connect to database");
+            res.sendStatus(403);
         });
 });
 
