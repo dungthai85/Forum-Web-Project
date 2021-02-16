@@ -4,8 +4,19 @@ const router = express.Router();
 const db = require('../utilities/mysqlconn');
 const validateToken = require('../utilities/validateToken');
 
+router.use(async (req, res, next) => {
+    await validateToken(req, res, next);
+    console.log("CHECKING TOKEN: " + req.token);
+    if(req.token){
+        console.log("VALID TOKEN");
+    } else {
+        console.log("No Token, Redirecting to login");
+
+        res.redirect('/login');    }
+});
+
 // Renders the index page
-router.get('/', validateToken, function (req, res) {
+router.get('/', function (req, res) {
     //Query db to open all of the posts
     db.query('SELECT * FROM TOPICS')
         .then((rows, err) => {
@@ -16,9 +27,11 @@ router.get('/', validateToken, function (req, res) {
         });
 });
 
+
 // Renders the addpost page
-router.get('/addpost', validateToken, function (req, res) {
-    if (req.user !== undefined) {
+router.get('/addpost', function (req, res) {
+    console.log(req.token);
+    if (req.token) {
         res.render('../views/addpost', { uid: req.user.id });
     } else {
         res.redirect('/login');
@@ -26,8 +39,8 @@ router.get('/addpost', validateToken, function (req, res) {
 });
 
 // Add endpoint to insert into list of topics
-router.post('/addpost', validateToken, function (req, res) {
-    if (req.user !== undefined) {
+router.post('/addpost', function (req, res) {
+    if (req.token) {
         var userid = req.user.id;
         var username = req.user.username;
         var topictitle = req.body.title;
@@ -51,8 +64,8 @@ router.post('/addpost', validateToken, function (req, res) {
 });
 
 // Renders the editpost page
-router.get('/editpost', validateToken, function (req, res) {
-    if (req.user) {
+router.get('/editpost', function (req, res) {
+    if (req.token) {
         var topicid = req.query.topic;
         if (topicid) {
             //Query db for the topic to edit
@@ -70,8 +83,8 @@ router.get('/editpost', validateToken, function (req, res) {
 });
 
 // edit endpoint to edit topic
-router.post('/editpost', validateToken, function (req, res) {
-    if (req.user) {
+router.post('/editpost', function (req, res) {
+    if (req.token) {
         var topictitle = req.body.title;
         var topicdetals = req.body.desc;
         var topicid = req.body.tid;
@@ -94,8 +107,8 @@ router.post('/editpost', validateToken, function (req, res) {
 });
 
 // Renders the delete page
-router.get('/deletepost', validateToken, function (req, res) {
-    if (req.user) {
+router.get('/deletepost', function (req, res) {
+    if (req.token) {
         var topicid = req.query.topic;
         if (topicid) {
             //Query db for the delete post
@@ -114,8 +127,8 @@ router.get('/deletepost', validateToken, function (req, res) {
 });
 
 // delete endpoint to delte topic
-router.post('/deletepost', validateToken, function (req, res) {
-    if (req.user) {
+router.post('/deletepost', function (req, res) {
+    if (req.token) {
         var topicid = req.body.tid;
         if (topicid) {
             //Query db for the delete post
@@ -133,8 +146,8 @@ router.post('/deletepost', validateToken, function (req, res) {
 });
 
 // Increment like
-router.get('/addlike', validateToken, function (req, res) {
-    if (req.user) {
+router.get('/addlike', function (req, res) {
+    if (req.token) {
         var topicid = req.query.topic;
         if (topicid) {
             //Query to get the row

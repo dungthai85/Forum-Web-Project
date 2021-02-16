@@ -1,12 +1,13 @@
 let jwt = require('jsonwebtoken');
 
-let validateToken = async (req, res, next) => {
+let validateToken = async function (req, res, next) {
     const token = req.cookies.access_token || '';
     try {
         if (!token){
             console.log("You need to Login!!");
         } else {
             const decrypt = await jwt.verify(token, process.env.CLIENT_SECRET);
+            req.token = true;
             req.user = {
                 id: decrypt.guid,
                 username: decrypt.name,
@@ -17,6 +18,7 @@ let validateToken = async (req, res, next) => {
         }
         next();
     } catch (err) {
+        req.token = false;
         console.log("Invalid token!!");
     }
 };

@@ -17,7 +17,11 @@
         <a class="nav-link noline" href="/api/comments/?topic=<%= topics[i].topicid%>"><p class="card-text"><%= topics[i].topicdetails %></p></a>
       </div>
       <div class="card-footer text-muted">
-        <p style="font-size: small;"><a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&page=home">👍</a> <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].username %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
+        <p style="font-size: small;">
+          <% if (user !== undefined && topics[i].userid !== user.id) { %>
+          <a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&page=home">👍</a>
+          <% } %>
+          <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].username %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
       </div>
     </div>
     <% } %>

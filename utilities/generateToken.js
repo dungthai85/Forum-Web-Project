@@ -1,6 +1,6 @@
 let jwt = require('jsonwebtoken');
 
-const generateToken = async (res, claims) => {
+const generateToken = async function (res, claims) {
     const token = jwt.sign(claims, process.env.CLIENT_SECRET);
     // console.log(token);
 

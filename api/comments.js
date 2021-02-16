@@ -18,7 +18,7 @@ router.get('/', validateToken, function (req, res) {
 
 // addcomment  endpoint to add coment topic
 router.post('/addcomment', validateToken, function (req, res) {
-    if (req.user) {
+    if (req.token) {
         var arr = req.body.tid;
         var userid = req.user.id;
         var username = req.user.username;
@@ -35,7 +35,7 @@ router.post('/addcomment', validateToken, function (req, res) {
 });
 
 router.get('/editcomment', validateToken, function (req, res) {
-    if (req.user) {
+    if (req.token) {
         var commentid = req.query.topic.split(',');
         if (commentid) {
             //Query db for the topic to edit
@@ -53,7 +53,7 @@ router.get('/editcomment', validateToken, function (req, res) {
 
 // edit comment  endpoint to edit coment topic
 router.post('/editcomment', validateToken, function (req, res) {
-    if (req.user) {
+    if (req.token) {
         var commentdetals = req.body.desc;
         var commentid = req.body.tid.split(',');
         if (commentdetals && commentid) {
@@ -64,8 +64,8 @@ router.post('/editcomment', validateToken, function (req, res) {
                     if (err) {
                         console.log(err.code);
                     }
+                    res.redirect(`/api/comments/?topic=${commentid[0]}`);
                 });
-            res.redirect(`/api/comments/?topic=${commentid[0]}`);
         } else {
             res.sendStatus(500);
         }
@@ -76,7 +76,7 @@ router.post('/editcomment', validateToken, function (req, res) {
 
 // delete endpoint to delete comment
 router.get('/deletecomment', validateToken, function (req, res) {
-    if (req.user) {
+    if (req.token) {
         var commentid = req.query.topic.split(',');
         if (commentid) {
             //Query db for the delete post
@@ -88,6 +88,25 @@ router.get('/deletecomment', validateToken, function (req, res) {
                 }
                 res.redirect(`/api/comments/?topic=${commentid[0]}`);
             });
+        }
+    } else {
+        res.redirect('/login');
+    }
+});
+
+// Increment comment like
+router.get('/commentlike', validateToken, function (req, res) {
+    if (req.token) {
+        var topicid = req.query.topic;
+        if (topicid) {
+            //Query to get the row
+            var query = `UPDATE COMMENTS SET points = points + 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?`;
+            db.query(query, [topicid, topicid])
+                .then(rows => {
+                    res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}`);
+                }).catch(err => {
+                    console.log(err.code);
+                });
         }
     } else {
         res.redirect('/login');
