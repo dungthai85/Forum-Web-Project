@@ -48,6 +48,7 @@ app.use('/api/topics', topicrouter);
 app.use('/api/comments', commentrouter);
 
 app.get('/', function (req, res) {
+    console.log("Hello we are on main page");
     res.send("HELLO THIS WORKS");
 })
 
