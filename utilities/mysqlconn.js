@@ -11,7 +11,7 @@ const connection = mysql.createPool({
 
 // connection.connect((err) => {
 //     if (err) throw err;
-//     console.log("Connected!");
+    console.log("Connected to SQL server!");
     // var sql1 = 'CREATE TABLE TOPICS (topicid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, userid VARCHAR(100) NOT NULL, username VARCHAR(100) NOT NULL, topicname VARCHAR(100) NOT NULL, topicdetails TEXT(6000) NOT NULL, points INT NOT NULL, posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP, comments INT NOT NULL)';
 
     // var sql1 = `CREATE TABLE COMMENTS (commentid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, topicid INT NOT NULL, userid VARCHAR(100) NOT NULL, username VARCHAR(100) NOT NULL, commentdetails TEXT(6000) NOT NULL, posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP, points INT NOT NULL)`;
