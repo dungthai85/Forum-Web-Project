@@ -44,6 +44,7 @@ router.use(async (req, res, next) => {
     if (req.token) {
         console.log("VALID TOKEN");
     } else {
+        req.login = true;
         console.log("No Token, Redirecting to login");
         res.redirect('/login');
     }
@@ -51,16 +52,20 @@ router.use(async (req, res, next) => {
 
 // Addcomment endpoint to add coment topic
 router.post('/addcomment', function (req, res) {
-    var arr = req.body.tid;
-    var userid = req.user.id;
-    var username = req.user.username;
-    var comment = req.body.desc;
-    query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = ?;`;
-    db.query(query, [arr, userid, username, comment, arr]).then(row => {
-        res.redirect(`/api/comments/?topic=${arr}`);
-    }).catch(err => {
-        res.status(503).send({ message: "The server is not ready to handle the request." });
-    });
+    if(req.user){
+        var arr = req.body.tid;
+        var userid = req.user.id;
+        var username = req.user.username;
+        var comment = req.body.desc;
+        query = `INSERT INTO COMMENTS (topicid, userid, username, commentdetails, posted, points) VALUES (?, ?, ?, ?, NOW(), 0); UPDATE TOPICS SET comments = comments+1 WHERE topicid = ?;`;
+        db.query(query, [arr, userid, username, comment, arr]).then(row => {
+            if (!req.login) {
+                res.redirect(`/api/comments/?topic=${arr}`);
+            }
+        }).catch(err => {
+            res.status(503).send({ message: "The server is not ready to handle the request." });
+        });
+    }
 });
 
 // Renders the edit comment page
@@ -72,7 +77,9 @@ router.get('/editcomment', function (req, res) {
         // Query db for the topic to edit
         db.query(`SELECT * FROM COMMENTS WHERE commentid = ?`, [commentid])
             .then(rows => {
-                res.render('../views/editcomment.ejs', { comments: rows[0], user: req.user, page: {currentPage: page}, post: [{topicid: topicid}]});
+                if (!req.login){
+                    res.render('../views/editcomment.ejs', { comments: rows[0], user: req.user, page: {currentPage: page}, post: [{topicid: topicid}]});
+                }
             }).catch(err => {
                 res.status(503).send({ message: "The server is not ready to handle the request." });
             });
@@ -96,7 +103,9 @@ router.post('/editcomment', function (req, res) {
                 if (err) {
                     res.send(err);
                 } else {
-                    res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+                    if (!req.login){
+                        res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+                    }
                 }
             }).catch(err => {
                 res.status(503).send({ message: "The server is not ready to handle the request." });
@@ -118,7 +127,9 @@ router.get('/deletecomment', function (req, res) {
             if (err) {
                 res.send(err);
             } else {
-                res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+                if (!req.login){
+                    res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+                }
             }
         }).catch(err => {
             res.status(503).send({ message: "The server is not ready to handle the request." });
@@ -135,7 +146,9 @@ router.get('/commentlike', function (req, res) {
         var query = `UPDATE COMMENTS SET points = points + 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?`;
         db.query(query, [topicid, topicid])
             .then(rows => {
-                res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}&page=${page}`);
+                if (!req.login){
+                    res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}&page=${page}`);
+                }
             }).catch(err => {
                 res.status(503).send({ message: "The server is not ready to handle the request." });
             });

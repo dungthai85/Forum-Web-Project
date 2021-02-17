@@ -34,7 +34,6 @@ app.get('/logout', function (req, res) {
     var page = req.query.page;
     var home = req.query.home;
     var topicid = req.query.topic;
-    console.log(page);
     res.clearCookie('access_token');
     if(home === "home"){
         res.redirect(`https://stg-account.samsung.com/accounts/v1/STWS/signOutGate?client_id=3694457r8f&state=CUSTOM_TOKEN&signOutURL=http://localhost:3000/api/topics/?page=${page}`);

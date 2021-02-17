@@ -6,7 +6,7 @@ const generateToken = async function (res, claims) {
 
     // return cookie called access_token with 5 min expiration
     return res.cookie('access_token', token, {
-        expires: new Date(Date.now() + 5 * 60 * 1000),
+        expires: new Date(Date.now() + 2 * 60 * 1000),
         httpOnly: true
     });
 }

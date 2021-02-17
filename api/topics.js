@@ -19,7 +19,7 @@ router.get('/', validateToken, function (req, res) {
                 var currentpage = req.query.page ? parseInt(req.query.page) : 1;
                 var start = totalsize - (currentpage * pagesize) + 8;
                 var end = start - 8;
-                if(end < 0){
+                if (end < 0) {
                     end = 0;
                 }
                 res.render('../views/index', { topics: rows[0], user: req.user, page: {
@@ -43,6 +43,7 @@ router.use(async (req, res, next) => {
     if (req.token) {
         console.log("VALID TOKEN");
     } else {
+        req.login = true;
         console.log("No Token, Redirecting to login");
         res.redirect('/login');
     }
@@ -57,25 +58,29 @@ router.get('/addpost', function (req, res) {
 
 // Add endpoint to insert into list of topics
 router.post('/addpost', function (req, res) {
-    var userid = req.user.id;
-    var username = req.user.username;
-    var topictitle = req.body.title;
-    var topicdesc = req.body.desc;
-    if (topictitle && topicdesc) {
-        // Query to add post
-        var query = `INSERT INTO TOPICS (userid, username, topicname, topicdetails, points, posted, comments) VALUES ( ? , ?, ? , ? , 0, NOW(), 0)`;
-        db.query(query, [userid, username, topictitle, topicdesc])
-            .then((rows, err) => {
-                if (err) {
-                    res.send(err);
-                } else {
-                    res.redirect('/api/topics/');
-                }
-            }).catch(err => {
-                res.status(503).send({ message: "The server is not ready to handle the request."});
-            });
-    } else {
-        res.sendStatus(500);
+    if(req.user){
+        var userid = req.user.id;
+        var username = req.user.username;
+        var topictitle = req.body.title;
+        var topicdesc = req.body.desc;
+        if (topictitle && topicdesc) {
+            // Query to add post
+            var query = `INSERT INTO TOPICS (userid, username, topicname, topicdetails, points, posted, comments) VALUES ( ? , ?, ? , ? , 0, NOW(), 0)`;
+            db.query(query, [userid, username, topictitle, topicdesc])
+                .then((rows, err) => {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        if (!req.login) {
+                            res.redirect('/api/topics/');
+                        }
+                    }
+                }).catch(err => {
+                    res.status(503).send({ message: "The server is not ready to handle the request."});
+                });
+        } else {
+            res.sendStatus(500);
+        }
     }
 });
 
@@ -88,7 +93,9 @@ router.get('/editpost', function (req, res) {
         var query = `SELECT * FROM TOPICS WHERE topicid = ?`;
         db.query(query, [topicid])
             .then(rows => {
-                res.render('../views/editpost.ejs', { post: rows[0], user: req.user, page: {currentPage: page}});
+                if (!req.login) {
+                    res.render('../views/editpost.ejs', { post: rows[0], user: req.user, page: {currentPage: page}});
+                }
             }).catch(err => {
                     res.status(503).send({ message: "The server is not ready to handle the request."});
             });
@@ -110,7 +117,9 @@ router.post('/editpost', function (req, res) {
                 if (err) {
                     res.send(err);
                 } else {
-                    res.redirect('/api/topics/');
+                    if (!req.login) {
+                        res.redirect('/api/topics/');
+                    }
                 }
             }).catch(err => {
                 res.status(503).send({ message: "The server is not ready to handle the request."});
@@ -132,7 +141,9 @@ router.get('/deletepost', function (req, res) {
             if (err) {
                 res.send(err);
             } else {
-                res.render('../views/deletepost', { post: rows[0], user: req.user, page: {currentPage : page} });
+                if (!req.login) {
+                    res.render('../views/deletepost', { post: rows[0], user: req.user, page: {currentPage : page} });
+                }
             }
         }).catch(err => {
             res.status(503).send({ message: "The server is not ready to handle the request."});
@@ -150,7 +161,9 @@ router.post('/deletepost', function (req, res) {
             if (err) {
                 res.send(err);
             } else {
-                res.redirect('/api/topics/');
+                if (!req.login) {
+                    res.redirect('/api/topics/');
+                }
             }
         }).catch(err => {
             res.status(503).send({ message: "The server is not ready to handle the request."});
@@ -168,14 +181,16 @@ router.get('/addlike', function (req, res) {
         var query = `UPDATE TOPICS SET points = points + 1 WHERE topicid = ? `;
         db.query(query, [topicid])
             .then(rows => {
-                if (home === "home") {
-                    if(page){
-                        res.redirect(`/api/topics/?page=${page}`);
+                if (!req.login){
+                    if (home === "home") {
+                        if (page) {
+                            res.redirect(`/api/topics/?page=${page}`);
+                        } else {
+                            res.redirect('/api/topics/');
+                        }
                     } else {
-                        res.redirect('/api/topics/');
+                        res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
                     }
-                } else {
-                    res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
                 }
             }).catch(err => {
                 res.status(503).send({ message: "The server is not ready to handle the request."});
