@@ -24,13 +24,13 @@
         </div>
         <div class="card-body">
             <blockquote class="blockquote mb-0">
-                <form action="http://34.220.239.52:3000/api/comments/editcomment" method="POST">
+                <form action="http://localhost:3000/api/comments/editcomment" method="POST">
                     <div class="mb-3">
                         <label for="topicdesc" class="form-label">Description</label>
-                        <textarea class="form-control" id="topicdesc" rows="5" name="desc" required><%= comment[0].commentdetails %></textarea>
+                        <textarea class="form-control" id="topicdesc" rows="5" name="desc" required><%= comments[0].commentdetails %></textarea>
                     </div>
                     <div class="mb-3">
-                        <button class="btn btn-outline-dark" type="submit" name ="tid" value="<%= comment[0].topicid %>,<%= comment[0].commentid %>">Edit Comment</button>
+                        <button class="btn btn-outline-dark" type="submit" name ="tid" value="<%= comments[0].topicid %>,<%= comments[0].commentid %>,<%= page.currentPage%>">Edit Comment</button>
                     </div>
                 </form>
             </blockquote>

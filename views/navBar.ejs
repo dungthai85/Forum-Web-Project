@@ -20,7 +20,7 @@
                       <a class="nav-link" href="/api/topics/addpost">Add post</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="/logout">Log Out</a>
+                      <a class="nav-link" href="/logout/?page=<%= page.currentPage %>&home=comment&topic=<%= post[0].topicid %>">Log Out</a>
                     </li>
                   <% } %>
             </ul>

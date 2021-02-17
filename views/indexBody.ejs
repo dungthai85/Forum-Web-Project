@@ -1,4 +1,4 @@
-<% for (var i = topics.length - 1; i >= 0; i--) {%>
+<% for (var i = page.countStart - 1; i >= page.countEnd; i--) {%>
     <div class="card" style="display: block;">
       <div class="card-body">
         <h5 class="card-title"><a class="nav-link noline" href="/api/comments/?topic=<%= topics[i].topicid%>"><%= topics.length - i %>. <%= topics[i].topicname %></a>
@@ -8,8 +8,8 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
               <% var t = topics[i].topicid %>
-              <li><a class="nav-link" href="/api/topics/editpost?topic=<%= t %>" >Edit</a></li>
-              <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>" >Delete</a></li>
+              <li><a class="nav-link" href="/api/topics/editpost?topic=<%= t %>&page=<%= page.currentPage %>" >Edit</a></li>
+              <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>&page=<%= page.currentPage %>" >Delete</a></li>
             </ul>
           </div>
           <% } %>
@@ -19,9 +19,42 @@
       <div class="card-footer text-muted">
         <p style="font-size: small;">
           <% if (user !== undefined && topics[i].userid !== user.id) { %>
-          <a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&page=home">👍</a>
+          <a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
           <% } %>
           <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].username %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
       </div>
     </div>
     <% } %>
+
+    <br>
+
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        <% if (page.currentPage == 1) { %>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+          </li>
+            <% } else { %> 
+          <li class="page-item"><a class="page-link"  style="color: black;" href="/api/topics/?page=<%= page.currentPage - 1 %>">Previous</a></li>
+          <% } %>
+
+        <% for(var j = 1; j <= page.pageCount; j++) { %>
+          <% if (j == page.currentPage) { %>
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><%= j %></a>
+        </li>
+          <% } else { %> 
+        <li class="page-item"><a class="page-link" style="color: black;" href="/api/topics/?page=<%= j %>"><%= j %></a></li>
+          <% } %>
+        <% } %>
+
+        <% if (page.currentPage == page.pageCount) { %>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+          </li>
+            <% } else { %> 
+          <li class="page-item"><a class="page-link" style="color: black;" href="/api/topics/?page=<%= page.currentPage + 1 %>">Next</a></li>
+          <% } %>
+      </ul>
+    </nav>

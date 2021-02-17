@@ -22,17 +22,20 @@ router.get('/signin/callback', async function (req, res) {
             }
         }
 
+        var page = req.query.page;
+        var home = req.query.home;
+        var topicid = req.query.topic;
+
         //Generate access token
         let generate = await rp(options);
         let profile = await getUser(generate, req.query.auth_server_url);
 
         //adding expiration to the token
         profile.exp = Math.floor(Date.now() / 1000) + (60 * 60);
-        // console.log((profile));
         
         // Creating a token to store in cookie
         await generateToken(res, profile);
-
+        
         res.redirect('/api/topics');
 
     } catch (error) {
