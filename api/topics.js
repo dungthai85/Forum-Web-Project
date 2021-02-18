@@ -38,8 +38,8 @@ router.get('/', validateToken, function (req, res) {
 });
 
 // Using the middleware to validate token.
-router.use(async (req, res, next) => {
-    await validateToken(req, res, next);
+router.use( (req, res, next) => {
+    validateToken(req, res, next);
     if (req.token) {
         console.log("VALID TOKEN");
     } else {
@@ -59,6 +59,7 @@ router.get('/addpost', function (req, res) {
 // Add endpoint to insert into list of topics
 router.post('/addpost', function (req, res) {
     if(req.user){
+        console.log("ADDING A POST");
         var userid = req.user.id;
         var username = req.user.username;
         var topictitle = req.body.title;
