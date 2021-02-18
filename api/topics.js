@@ -24,6 +24,7 @@ router.get('/', validateToken, function (req, res) {
                         userLikes[topicLikes[key].userid].push(topicLikes[key].topicid);
                     }
                 }
+
                 // Calculation for the pagination
                 var totalsize = tableTopics.length;
                 var pagesize = 8;
@@ -46,7 +47,7 @@ router.get('/', validateToken, function (req, res) {
                 });
             }
         }).catch(err => {
-            console.log("Could Not Connect to database :" + err);
+            console.log("Could Not Connect to database: " + err);
             res.sendStatus(403);
         });
 });
