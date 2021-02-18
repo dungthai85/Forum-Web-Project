@@ -20,12 +20,30 @@ const connection = mysql.createPool({
 
         // var sql1 = 'DROP TABLE COMMENTS';
 
-    // connection.query(sql1).then(row => {
-    //     console.log("Created")
+        // var sql1 = 'CREATE TABLE TLIKES (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, topicid INT NOT NULL, userid VARCHAR(100) NOT NULL)'
+        // var sql1 = 'CREATE TABLE CLIKES (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, commentid INT NOT NULL, userid VARCHAR(100) NOT NULL)'
+
+
+        // connection.query(sql1).then(row => {
+        //     console.log("Created");
+        // }).catch(err =>{
+        //     console.log(err)
+    
+        // })
+
+    // connection.query(`Select userid FROM COMMENTS WHERE topicid = 23`).then(row => {
+    //     console.log("Created");
+    //     console.log(row[0].length);
+    //     Object.keys(row[0]).forEach(function(key) {
+    //         if(row[0][key].userid === 'hc6zbemnkg') {
+    //             console.log("Yes");
+    //         }
+    //     });
     // }).catch(err =>{
     //     console.log(err)
 
     // })
+
     // connection.query('SELECT * FROM COMMENTS').then(row => {
     //     console.table(row[0]);
     // })
