@@ -24,10 +24,10 @@
     <p style="font-size: small;">
       <% if (user !==undefined && post[0].userid !==user.id) { %>
         <% if (Object.keys(userTLikes).length===0) { %>
-          <a
+          <a class="noline"
             href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&home=curr&page=<%= page.currentPage %>">👍</a>
         <% } else if (!userTLikes[user.id] || !userTLikes[user.id].includes(post[0].topicid)) { %>
-            <a
+            <a class="noline"
               href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&home=curr&page=<%= page.currentPage %>">👍</a>
         <% } %>
       <% } %>
@@ -37,9 +37,10 @@
 
     <!-- If youre logged in, you can add a comment -->
     <% if (user !== undefined) { %>
+      <%= post[0].comments %> comments |
       <a  class="noline" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown"
                 aria-controls="navbarNavDarkDropdown" aria-expanded="false">
-        <%= post[0].comments %> comments
+        add comment
                 </a>
       </p>
       
@@ -72,7 +73,7 @@
 </div>
 <!-- Displaying the comments -->
 <% if (comments.length !==0) { %>
-  <% for(var j=page.countStart - 1; j>= page.countEnd; j--){ %>
+  <% for(var j= comments.length - 1; j>= 0; j--, page.countStart--){ %>
     <div class="card" style="display: block;">
       <div class="card-body">
     <% if(user !==undefined && comments[j].userid===user.id ) { %>
@@ -94,21 +95,21 @@
       <% } %>
             </h5>
             <p class="card-text">
-              <%= comments.length - j %>. <%= comments[j].commentdetails %>
+              <%= page.totalSize + 1 - page.countStart %>. <%= comments[j].commentdetails %>
             </p>
             <p style="font-size: small;">
               <% if (user !==undefined && comments[j].userid !==user.id) { %>
                 <% if (Object.keys(userCLikes).length===0) { %>
-                  <a
+                  <a class="noline"
                     href="/api/comments/commentlike?like=like&topic=<%= comments[j].commentid%>&page=<%= page.currentPage %>">👍</a>
                 <% } else if (!userCLikes[user.id] || !userCLikes[user.id].includes(comments[j].commentid)) { %>
-                    <a
+                    <a class="noline"
                       href="/api/comments/commentlike?like=like&topic=<%= comments[j].commentid%>&page=<%= page.currentPage %>">👍</a>
                 <% } %>
               <% } %>
               <%= comments[j].points %> points by <a href="#" class="noline">
               <%= comments[j].username %>
-                          </a> |
+                          </a> 
             </p>
       </div>
     </div>

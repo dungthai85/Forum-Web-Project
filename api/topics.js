@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const db = require('../utilities/mysqlconn');
@@ -7,44 +6,68 @@ const validateToken = require('../utilities/validateToken');
 // Renders the index page
 router.get('/', validateToken, function (req, res) {
     // Query db to open all of the posts
-    var query = 'SELECT * FROM TOPICS; SELECT * FROM TLIKES;'
-    db.query(query)
+    var query1 = `SELECT COUNT(topicid) as tablelength FROM TOPICS;`
+    db.query(query1)
         .then((rows, err) => {
             if (err) {
                 res.send(err);
             } else {
-                var tableTopics = rows[0][0];
-                var topicLikes = rows[0][1];
-                var userLikes = {};
-                //Calculate the like display, checks users and all their topic likes
-                for (const [key, value] of Object.entries(topicLikes)) {
-                    if (!userLikes[topicLikes[key].userid]){
-                        userLikes[topicLikes[key].userid] = [topicLikes[key].topicid]
-                    } else {
-                        userLikes[topicLikes[key].userid].push(topicLikes[key].topicid);
-                    }
-                }
-
                 // Calculation for the pagination
-                var totalsize = tableTopics.length;
+                var totalsize = rows[0][0].tablelength;
                 var pagesize = 8;
                 var pagecount = Math.ceil(totalsize / pagesize);
                 var currentpage = req.query.page ? parseInt(req.query.page) : 1;
                 var start = totalsize - (currentpage * pagesize) + 8;
                 var end = start - 8;
+                var endquery = pagesize;
                 if (end < 0) {
+                    endquery = start;
                     end = 0;
                 }
-                res.render('../views/index', {
-                    topics: tableTopics, user: req.user, userLikes: userLikes, page: {
-                        totalSize: totalsize,
-                        pageSize: pagesize,
-                        pageCount: pagecount,
-                        currentPage: currentpage,
-                        countStart: start,
-                        countEnd: end
-                    }
-                });
+                if (!req.user) {
+                    var query2 = `SELECT * FROM TOPICS LIMIT ?, ?;`
+                    db.query(query2, [end, endquery]).then((rows, err) => {
+                        var tableTopics = rows[0];
+                        res.render('../views/index', {
+                            topics: tableTopics, user: req.user, userLikes: {}, page: {
+                                totalSize: totalsize,
+                                pageSize: pagesize,
+                                pageCount: pagecount,
+                                currentPage: currentpage,
+                                countStart: start,
+                                countEnd: end
+                            }
+                        });
+                    });
+
+                } else {
+                    var userid = req.user.id;
+                    console.log(userid);
+                    var query2 = `SELECT * FROM TOPICS LIMIT ?, ?; SELECT * FROM TLIKES WHERE userid = ?;`
+                    db.query(query2, [end, endquery, userid]).then((rows, err) => {
+                        var tableTopics = rows[0][0];
+                        var topicLikes = rows[0][1];
+                        var userLikes = {};
+                        //Calculate the like display, checks users and all their topic likes
+                        for (const [key, value] of Object.entries(topicLikes)) {
+                            if (!userLikes[req.user.id]) {
+                                userLikes[req.user.id] = [topicLikes[key].topicid]
+                            } else {
+                                userLikes[req.user.id].push(topicLikes[key].topicid);
+                            }
+                        }
+                        res.render('../views/index', {
+                            topics: tableTopics, user: req.user, userLikes: userLikes, page: {
+                                totalSize: totalsize,
+                                pageSize: pagesize,
+                                pageCount: pagecount,
+                                currentPage: currentpage,
+                                countStart: start,
+                                countEnd: end
+                            }
+                        });
+                    });
+                }
             }
         }).catch(err => {
             console.log("Could Not Connect to database: " + err);
@@ -160,7 +183,7 @@ router.post('/deletepost', function (req, res) {
             if (err) {
                 res.send(err);
             } else {
-                res.redirect('/api/topics/');
+                res.redirect(`/api/topics`);
             }
         }).catch(err => {
             res.status(503).send({ message: "The server is not ready to handle the request." });

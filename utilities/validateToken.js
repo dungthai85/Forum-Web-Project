@@ -4,7 +4,6 @@ function validateToken(req, res, next) {
     const token = req.cookies.access_token || '';
     if (!token) {
         console.log("You need to Login to create a post or comment!");
-        req.token = false;
         next();
     } else {
         jwt.verify(token, process.env.CLIENT_SECRET, (err, decrypt) => {

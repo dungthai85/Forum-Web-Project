@@ -1,8 +1,8 @@
 <!-- Displays the list of Posts -->
-<% for (var i = page.countStart - 1; i >= page.countEnd; i--) {%>
+<% for (var i = topics.length - 1; i >= 0; i--, page.countStart--) {%>
     <div class="card" style="display: block;">
       <div class="card-body">
-        <h5 class="card-title"><a class="nav-link noline" href="/api/comments/?topic=<%= topics[i].topicid%>"><%= topics.length - i %>. <%= topics[i].topicname %></a>
+        <h5 class="card-title"><a class="nav-link noline" href="/api/comments/?topic=<%= topics[i].topicid%>"><%= page.totalSize + 1 - page.countStart %>. <%= topics[i].topicname %></a>
           <% if(user !== undefined && topics[i].userid === user.id ) { %>
           <div class="dropdown" style="float: right;">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
@@ -21,9 +21,9 @@
         <p style="font-size: small;">
           <% if (user !== undefined && topics[i].userid !== user.id ) { %>
             <% if (Object.keys(userLikes).length === 0) { %>
-              <a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
+              <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
               <% } else if (!userLikes[user.id] || !userLikes[user.id].includes(topics[i].topicid)) { %>
-                <a href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
+                <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
             <% } %>
           <% } %>
           <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].username %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
