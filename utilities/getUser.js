@@ -1,7 +1,12 @@
 const rp = require('request-promise');
 const parseXML = require('xml2js').parseString;
 
-let getUser = async function (parsed, url) {
+/**
+ * Parses the JSON and extracts the information and returns a user profile
+ * @param {Promise to be parsed} parsed 
+ * @param {Authorization url} url 
+ */
+async function getUser(parsed, url) {
     const json = JSON.parse(parsed);
     var options = {
         url: `https://${url}/v2/profile/user/user/${json.userId}`,
@@ -19,7 +24,11 @@ let getUser = async function (parsed, url) {
     return profile;
 }
 
-
+/**
+ * Extracts the profile info and returns a user profile.
+ * @param {Body to be parsed} body 
+ * @param {JSON ACCESS TOKEN} accessToken 
+ */
 function extractProfileInfo(body, accessToken) {
     return new Promise(function (resolve, reject) {
         parseXML(body, function (err, obj) {

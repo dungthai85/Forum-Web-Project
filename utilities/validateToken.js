@@ -1,5 +1,11 @@
 let jwt = require('jsonwebtoken');
 
+/**
+ * Middleware function that checks the token in the cookie, verifies it and stores the user content to the request.
+ * @param {Request} req 
+ * @param {Resonse} res 
+ * @param {Next} next 
+ */
 function validateToken(req, res, next) {
     const token = req.cookies.access_token || '';
     if (!token) {
