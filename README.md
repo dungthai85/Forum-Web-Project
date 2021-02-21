@@ -1,6 +1,6 @@
 # Full-Stack Forum Board Web Project.
 
-##Create a light message board with basic REST api's.
+## Create a light message board with basic REST api's.
  - View list of topic
  - View one topic
  - Reply on topic
