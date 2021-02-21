@@ -14,6 +14,6 @@
 - SA Login
 - Login session via cookie(jwt)
 
-## Use MySQL for database and EJS for server-side rendering.
+## MySQL for database and EJS for server-side rendering.
 
-## Project is deployed onto AWS.
+## Deploy node server onto AWS.
