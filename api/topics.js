@@ -6,10 +6,10 @@ const validateToken = require('../utilities/validateToken');
 // Renders the index page
 router.get('/', validateToken, function (req, res) {
     //First Query to get the count for pagination
-    var query1 = `SELECT COUNT(topicid) as tablelength FROM TOPICS;`
-    db.query(query1).then((count, err) => {
-        if (err) {
-            res.send(err);
+    var query1 = `SELECT COUNT(topicid) as tablelength FROM TOPICS;`;
+    db.query(query1).then((count, err1) => {
+        if (err1) {
+            res.send(err1);
         } else {
             // Calculation for pagination
             var totalsize = count[0][0].tablelength;
@@ -24,10 +24,10 @@ router.get('/', validateToken, function (req, res) {
                 end = totalsize - 1
             }
             // Query 2 to get the table from start of page to end of page
-            var query2 = `SELECT * FROM TOPICS ORDER BY topicid DESC LIMIT ?, ?;`
-            db.query(query2, [start, endquery]).then((table, err) => {
-                if (err) {
-                    res.send(err);
+            var query2 = `SELECT * FROM TOPICS ORDER BY topicid DESC LIMIT ?, ?;`;
+            db.query(query2, [start, endquery]).then((table, err2) => {
+                if (err2) {
+                    res.send(err2);
                 } else {
                     var tableTopics = table[0];
                     if (!req.user) {
@@ -48,10 +48,10 @@ router.get('/', validateToken, function (req, res) {
                             currentTopicNum.push(tableTopics[key].topicid);
                         }
                         //Final query to get likes from table for user
-                        var query3 = `SELECT * FROM TLIKES WHERE userid = ? AND topicid IN (${currentTopicNum.join(',')});`
-                        db.query(query3, req.user.id).then((tlikes, err) => {
-                            if (err) {
-                                res.send(err);
+                        var query3 = `SELECT * FROM TLIKES WHERE userid = ? AND topicid IN (${currentTopicNum.join(',')});`;
+                        db.query(query3, req.user.id).then((tlikes, err3) => {
+                            if (err3) {
+                                res.send(err3);
                             } else {
                                 var tLikes = tlikes[0];
                                 var userLikes = {};

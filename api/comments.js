@@ -7,62 +7,155 @@ const validateToken = require('../utilities/validateToken');
 router.get('/', validateToken, function (req, res) {
     var topicid = req.query.topic;
     if (topicid) {
-        var query1 = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT COUNT(commentid) as commentlength FROM COMMENTS WHERE topicid = ?;`
-        db.query(query1, [topicid, topicid]).then((row, err) => {
-            if (err) {
-                res.send(err);
+        //First query to get the count and the topic
+        var query1 = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT COUNT(commentid) as commentlength FROM COMMENTS WHERE topicid = ?;`;
+        db.query(query1, [topicid, topicid]).then((row, err1) => {
+            if (err1) {
+                res.send(err1);
             } else {
                 // Calculation for the pagination
                 var totalsize = row[0][1][0].commentlength;
                 var pagesize = 10;
                 var pagecount = Math.ceil(totalsize / pagesize);
                 var currentpage = req.query.page ? parseInt(req.query.page) : 1;
-                var start = totalsize - (currentpage * pagesize) + 10;
-                var end = start - 10;
+                var start = (currentpage * pagesize) - 10;
+                var end = start + 9;
                 var endquery = pagesize;
-                if (end < 0) {
-                    endquery = start;
-                    end = 0;
+                if (end > totalsize) {
+                    endquery = totalsize - start;
+                    end = totalsize - 1;
                 }
                 // Table for topic
                 var tableTopics = row[0][0];
-                if (!req.user) {
-                    var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? LIMIT ?, ?;`
-                    db.query(query2, [topicid, end, endquery]).then((rows, err) => {
+                // Second query to get table for comments
+                var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? ORDER BY commentid DESC LIMIT ?, ?;`;
+                db.query(query2, [topicid, start, endquery]).then((rows, err2) => {
+                    if (err2) {
+                        res.send(err2);
+                    } else {
+                        // Table of comments
                         var tableComments = rows[0];
-                        res.render('../views/comment', {
-                            post: tableTopics, comments: tableComments, user: req.user, userTLikes: {}, userCLikes: {}, page: {
-                                totalSize: totalsize,
-                                pageSize: pagesize,
-                                pageCount: pagecount,
-                                currentPage: currentpage,
-                                countStart: start,
-                                countEnd: end
+                        if (!req.user) {
+                            res.render('../views/comment', {
+                                post: tableTopics, comments: tableComments, user: req.user, userTLikes: {}, userCLikes: {}, page: {
+                                    totalSize: totalsize,
+                                    pageSize: pagesize,
+                                    pageCount: pagecount,
+                                    currentPage: currentpage,
+                                    countStart: start,
+                                    countEnd: endquery
+                                }
+                            });
+                        } else {
+                            //Calculate the like display, checks users and all their comment likes
+                            var currentCommentNum = [];
+                            for (const [key, value] of Object.entries(tableComments)) {
+                                currentCommentNum.push(tableComments[key].commentid);
                             }
-                        });
-                    })
-                } else {
-                    var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? LIMIT ?, ?; SELECT * FROM TLIKES WHERE userid = ?; SELECT * FROM CLIKES WHERE userid = ?;`
-                    db.query(query2, [topicid, end, endquery, req.user.id, req.user.id]).then((rows, err) => {
-                        var tableComments = rows[0][0];
-                        var userTLikes = rows[0][1];
-                        var userCLikes = rows[0][2];
-                        console.log(tableComments.length);
-                        res.render('../views/comment', {
-                            post: tableTopics, comments: tableComments, user: req.user, userTLikes: userTLikes, userCLikes: userCLikes, page: {
-                                totalSize: totalsize,
-                                pageSize: pagesize,
-                                pageCount: pagecount,
-                                currentPage: currentpage,
-                                countStart: start,
-                                countEnd: end
-                            }
-                        });
-                    })
-                }
+                            console.log(currentCommentNum);
+                            currentCommentNum.push(46);
+                            // Final query to get likes from topics and comments from current user
+                            var query3 = `SELECT * FROM TLIKES WHERE userid = ? and topicid = ?; SELECT * FROM CLIKES WHERE userid = ? AND commentid IN (${currentCommentNum.join(',')});`;
+                            db.query(query3, [req.user.id, topicid, req.user.id]).then((likes, err3) => {
+                                if (err3) {
+                                    res.send(err3);
+                                } else {
+                                    var userTLikes = likes[0][0];
+                                    var userCLikes = {};
+                                    var clikes = likes[0][1];
+                                    //Calculate the like display, checks users and all their topic likes
+                                    for (const [key, value] of Object.entries(clikes)) {
+                                        if (!userCLikes[req.user.id]) {
+                                            userCLikes[req.user.id] = [clikes[key].commentid]
+                                        } else {
+                                            userCLikes[req.user.id].push(clikes[key].commentid);
+                                        }
+                                    }
+                                    res.render('../views/comment', {
+                                        post: tableTopics, comments: tableComments, user: req.user, userTLikes: userTLikes, userCLikes: userCLikes, page: {
+                                            totalSize: totalsize,
+                                            pageSize: pagesize,
+                                            pageCount: pagecount,
+                                            currentPage: currentpage,
+                                            countStart: start,
+                                            countEnd: end
+                                        }
+                                    });
+                                }
+                            }).catch((error3) => {
+                                res.send(error3);
+                            });
+                        }
+                    }
+                }).catch((error2) => {
+                    res.send(error2);
+                });
             }
-        })
+        }).catch((error1) => {
+            res.send(error1);
+        });
+
+    } else {
+        res.send("Invalid Comment Selection!");
     }
+    // var topicid = req.query.topic;
+    // if (topicid) {
+    //     var query1 = `SELECT * FROM TOPICS WHERE topicid = ?; SELECT COUNT(commentid) as commentlength FROM COMMENTS WHERE topicid = ?;`
+    //     db.query(query1, [topicid, topicid]).then((row, err) => {
+    //         if (err) {
+    //             res.send(err);
+    //         } else {
+    //             // Calculation for the pagination
+    //             var totalsize = row[0][1][0].commentlength;
+    //             var pagesize = 10;
+    //             var pagecount = Math.ceil(totalsize / pagesize);
+    //             var currentpage = req.query.page ? parseInt(req.query.page) : 1;
+    //             var start = totalsize - (currentpage * pagesize) + 10;
+    //             var end = start - 10;
+    //             var endquery = pagesize;
+    //             if (end < 0) {
+    //                 endquery = start;
+    //                 end = 0;
+    //             }
+    //             // Table for topic
+    //             var tableTopics = row[0][0];
+    //             if (!req.user) {
+    //                 var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? LIMIT ?, ?;`
+    //                 db.query(query2, [topicid, end, endquery]).then((rows, err) => {
+    //                     var tableComments = rows[0];
+    //                     res.render('../views/comment', {
+    //                         post: tableTopics, comments: tableComments, user: req.user, userTLikes: {}, userCLikes: {}, page: {
+    //                             totalSize: totalsize,
+    //                             pageSize: pagesize,
+    //                             pageCount: pagecount,
+    //                             currentPage: currentpage,
+    //                             countStart: start,
+    //                             countEnd: end
+    //                         }
+    //                     });
+    //                 })
+    //             } else {
+    //                 var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? LIMIT ?, ?; SELECT * FROM TLIKES WHERE userid = ?; SELECT * FROM CLIKES WHERE userid = ?;`
+    //                 db.query(query2, [topicid, end, endquery, req.user.id, req.user.id]).then((rows, err) => {
+    //                     var tableComments = rows[0][0];
+    //                     var userTLikes = rows[0][1];
+    //                     var userCLikes = rows[0][2];
+    //                     console.log(tableComments.length);
+    //                     res.render('../views/comment', {
+    //                         post: tableTopics, comments: tableComments, user: req.user, userTLikes: userTLikes, userCLikes: userCLikes, page: {
+    //                             totalSize: totalsize,
+    //                             pageSize: pagesize,
+    //                             pageCount: pagecount,
+    //                             currentPage: currentpage,
+    //                             countStart: start,
+    //                             countEnd: end
+    //                         }
+    //                     });
+    //                 })
+    //             }
+    //         }
+    //     })
+    // }
 });
 
 // Using the middleware to validate token.

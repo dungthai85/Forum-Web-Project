@@ -74,7 +74,7 @@
 
 <!-- Displaying the comments -->
 <% if (comments.length !==0) { %>
-  <% for(var j= comments.length - 1; j>= 0; j--, page.countStart--){ %>
+  <% for(var j= 0; j < page.countEnd; j++){ %>
     <div class="card" style="display: block;">
       <div class="card-body">
     <% if(user !==undefined && comments[j].userid===user.id ) { %>
@@ -96,7 +96,7 @@
       <% } %>
             </h5>
             <p class="card-text">
-              <%= page.totalSize + 1 - page.countStart %>. <%= comments[j].commentdetails %>
+              <%= page.countStart + j + 1 %>. <%= comments[j].commentdetails %>
             </p>
             <p style="font-size: small;">
               <% if (user !==undefined && comments[j].userid !==user.id) { %>
