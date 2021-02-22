@@ -52,25 +52,33 @@ router.get('/', validateToken, function (req, res) {
                             for (const [key, value] of Object.entries(tableComments)) {
                                 currentCommentNum.push(tableComments[key].commentid);
                             }
-                            console.log(currentCommentNum);
-                            currentCommentNum.push(46);
                             // Final query to get likes from topics and comments from current user
-                            var query3 = `SELECT * FROM TLIKES WHERE userid = ? and topicid = ?; SELECT * FROM CLIKES WHERE userid = ? AND commentid IN (${currentCommentNum.join(',')});`;
+                            var query3 = `SELECT * FROM TLIKES WHERE userid = ? and topicid = ?; SELECT * FROM CLIKES WHERE userid = ? AND commentid IN (${currentCommentNum.length === 0 ? 0 : currentCommentNum.join(',')});`;
                             db.query(query3, [req.user.id, topicid, req.user.id]).then((likes, err3) => {
                                 if (err3) {
                                     res.send(err3);
                                 } else {
-                                    var userTLikes = likes[0][0];
+                                    var userTLikes = {};
                                     var userCLikes = {};
+                                    var tlikes = likes[0][0];
                                     var clikes = likes[0][1];
                                     //Calculate the like display, checks users and all their topic likes
+                                    for (const [key, value] of Object.entries(tlikes)) {
+                                        if (!userTLikes[req.user.id]) {
+                                            userTLikes[req.user.id] = [tlikes[key].topicid];
+                                        } else {
+                                            userTLikes[req.user.id].push(tlikes[key].topicid);
+                                        }
+                                    }
+                                    //Calculate the like display, checks users and all their comment likes
                                     for (const [key, value] of Object.entries(clikes)) {
                                         if (!userCLikes[req.user.id]) {
-                                            userCLikes[req.user.id] = [clikes[key].commentid]
+                                            userCLikes[req.user.id] = [clikes[key].commentid];
                                         } else {
                                             userCLikes[req.user.id].push(clikes[key].commentid);
                                         }
                                     }
+                                    // console.table(tableComments);
                                     res.render('../views/comment', {
                                         post: tableTopics, comments: tableComments, user: req.user, userTLikes: userTLikes, userCLikes: userCLikes, page: {
                                             totalSize: totalsize,
@@ -78,11 +86,12 @@ router.get('/', validateToken, function (req, res) {
                                             pageCount: pagecount,
                                             currentPage: currentpage,
                                             countStart: start,
-                                            countEnd: end
+                                            countEnd: endquery
                                         }
                                     });
                                 }
                             }).catch((error3) => {
+                                console.log(error3);
                                 res.send(error3);
                             });
                         }
