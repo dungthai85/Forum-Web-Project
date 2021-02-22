@@ -5,29 +5,32 @@ const validateToken = require('../utilities/validateToken');
 
 // Renders the index page
 router.get('/', validateToken, function (req, res) {
-    // Query db to open all of the posts
+    //First Query to get the count for pagination
     var query1 = `SELECT COUNT(topicid) as tablelength FROM TOPICS;`
-    db.query(query1)
-        .then((rows, err) => {
-            if (err) {
-                res.send(err);
-            } else {
-                // Calculation for the pagination
-                var totalsize = rows[0][0].tablelength;
-                var pagesize = 8;
-                var pagecount = Math.ceil(totalsize / pagesize);
-                var currentpage = req.query.page ? parseInt(req.query.page) : 1;
-                var start = totalsize - (currentpage * pagesize) + 8;
-                var end = start - 8;
-                var endquery = pagesize;
-                if (end < 0) {
-                    endquery = start;
-                    end = 0;
-                }
-                if (!req.user) {
-                    var query2 = `SELECT * FROM TOPICS LIMIT ?, ?;`
-                    db.query(query2, [end, endquery]).then((rows, err) => {
-                        var tableTopics = rows[0];
+    db.query(query1).then((count, err) => {
+        if (err) {
+            res.send(err);
+        } else {
+            // Calculation for pagination
+            var totalsize = count[0][0].tablelength;
+            var pagesize = 8;
+            var pagecount = Math.ceil(totalsize / pagesize);
+            var currentpage = req.query.page ? parseInt(req.query.page) : 1;
+            var start = (currentpage * pagesize) - 8;
+            var end = start + 7;
+            var endquery = pagesize;
+            if (end > totalsize) {
+                endquery = totalsize - start;
+                end = totalsize - 1
+            }
+            // Query 2 to get the table from start of page to end of page
+            var query2 = `SELECT * FROM TOPICS ORDER BY topicid DESC LIMIT ?, ?;`
+            db.query(query2, [start, endquery]).then((table, err) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    var tableTopics = table[0];
+                    if (!req.user) {
                         res.render('../views/index', {
                             topics: tableTopics, user: req.user, userLikes: {}, page: {
                                 totalSize: totalsize,
@@ -35,44 +38,120 @@ router.get('/', validateToken, function (req, res) {
                                 pageCount: pagecount,
                                 currentPage: currentpage,
                                 countStart: start,
-                                countEnd: end
+                                countEnd: endquery
                             }
                         });
-                    });
-
-                } else {
-                    var userid = req.user.id;
-                    console.log(userid);
-                    var query2 = `SELECT * FROM TOPICS LIMIT ?, ?; SELECT * FROM TLIKES WHERE userid = ?;`
-                    db.query(query2, [end, endquery, userid]).then((rows, err) => {
-                        var tableTopics = rows[0][0];
-                        var topicLikes = rows[0][1];
-                        var userLikes = {};
+                    } else {
                         //Calculate the like display, checks users and all their topic likes
-                        for (const [key, value] of Object.entries(topicLikes)) {
-                            if (!userLikes[req.user.id]) {
-                                userLikes[req.user.id] = [topicLikes[key].topicid]
-                            } else {
-                                userLikes[req.user.id].push(topicLikes[key].topicid);
-                            }
+                        var currentTopicNum = [];
+                        for (const [key, value] of Object.entries(tableTopics)) {
+                            currentTopicNum.push(tableTopics[key].topicid);
                         }
-                        res.render('../views/index', {
-                            topics: tableTopics, user: req.user, userLikes: userLikes, page: {
-                                totalSize: totalsize,
-                                pageSize: pagesize,
-                                pageCount: pagecount,
-                                currentPage: currentpage,
-                                countStart: start,
-                                countEnd: end
+                        //Final query to get likes from table for user
+                        var query3 = `SELECT * FROM TLIKES WHERE userid = ? AND topicid IN (${currentTopicNum.join(',')});`
+                        db.query(query3, req.user.id).then((tlikes, err) => {
+                            if (err) {
+                                res.send(err);
+                            } else {
+                                var tLikes = tlikes[0];
+                                var userLikes = {};
+                                //Calculate the like display, checks users and all their topic likes
+                                for (const [key, value] of Object.entries(tLikes)) {
+                                    if (!userLikes[req.user.id]) {
+                                        userLikes[req.user.id] = [tLikes[key].topicid]
+                                    } else {
+                                        userLikes[req.user.id].push(tLikes[key].topicid);
+                                    }
+                                }
+                                res.render('../views/index', {
+                                    topics: tableTopics, user: req.user, userLikes: userLikes, page: {
+                                        totalSize: totalsize,
+                                        pageSize: pagesize,
+                                        pageCount: pagecount,
+                                        currentPage: currentpage,
+                                        countStart: start,
+                                        countEnd: endquery
+                                    }
+                                });
                             }
+                        }).catch((error3) => {
+                            res.send(error3);
                         });
-                    });
+                    }
                 }
-            }
-        }).catch(err => {
-            console.log("Could Not Connect to database: " + err);
-            res.sendStatus(403);
-        });
+            }).catch((error2) => {
+                res.send(error2);
+            });
+        }
+    }).catch((error1) => {
+        res.send(error1);
+    });
+    // // Query db to open all of the posts
+    // var query1 = `SELECT COUNT(topicid) as tablelength FROM TOPICS;`
+    // db.query(query1)
+    //     .then((rows, err) => {
+    //         if (err) {
+    //             res.send(err);
+    //         } else {
+    //             // Calculation for the pagination
+    //             var totalsize = rows[0][0].tablelength;
+    //             var pagesize = 8;
+    //             var pagecount = Math.ceil(totalsize / pagesize);
+    //             var currentpage = req.query.page ? parseInt(req.query.page) : 1;
+    //             var start = totalsize - (currentpage * pagesize) + 8;
+    //             var end = start - 8;
+    //             var endquery = pagesize;
+    //             if (end < 0) {
+    //                 endquery = start;
+    //                 end = 0;
+    //             }
+    //             if (!req.user) {
+    //                 var query2 = `SELECT * FROM TOPICS LIMIT ?, ?;`
+    //                 db.query(query2, [end, endquery]).then((rows, err) => {
+    //                     var tableTopics = rows[0];
+    //                     res.render('../views/index', {
+    //                         topics: tableTopics, user: req.user, userLikes: {}, page: {
+    //                             totalSize: totalsize,
+    //                             pageSize: pagesize,
+    //                             pageCount: pagecount,
+    //                             currentPage: currentpage,
+    //                             countStart: start,
+    //                             countEnd: end
+    //                         }
+    //                     });
+    //                 });
+    //             } else {
+    //                 var userid = req.user.id;
+    //                 var query2 = `SELECT * FROM TOPICS LIMIT ?, ?; SELECT * FROM TLIKES WHERE userid = ?;`
+    //                 db.query(query2, [end, endquery, userid]).then((rows, err) => {
+    //                     var tableTopics = rows[0][0];
+    //                     var topicLikes = rows[0][1];
+    //                     var userLikes = {};
+    //                     //Calculate the like display, checks users and all their topic likes
+    //                     for (const [key, value] of Object.entries(topicLikes)) {
+    //                         if (!userLikes[req.user.id]) {
+    //                             userLikes[req.user.id] = [topicLikes[key].topicid]
+    //                         } else {
+    //                             userLikes[req.user.id].push(topicLikes[key].topicid);
+    //                         }
+    //                     }
+    //                     res.render('../views/index', {
+    //                         topics: tableTopics, user: req.user, userLikes: userLikes, page: {
+    //                             totalSize: totalsize,
+    //                             pageSize: pagesize,
+    //                             pageCount: pagecount,
+    //                             currentPage: currentpage,
+    //                             countStart: start,
+    //                             countEnd: end
+    //                         }
+    //                     });
+    //                 });
+    //             }
+    //         }
+    //     }).catch(err => {
+    //         console.log("Could Not Connect to database: " + err);
+    //         res.sendStatus(403);
+    //     });
 });
 
 // Using the middleware to validate token.
