@@ -26,7 +26,32 @@
                 <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
             <% } %>
           <% } %>
-          <%= topics[i].points %> points by <a href="#" class="noline"><%= topics[i].username %></a> | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
+          <%= topics[i].points %> points by <%= topics[i].username %>
+          |
+          <%             
+              var currentTime = new Date();
+              currentTime.setHours(currentTime.getHours() + 8);
+              var timediff = currentTime - topics[i].posted;
+              var seconds = Math.floor((timediff)/1000);
+              var minutes = Math.floor(seconds/60);
+              var hours = Math.floor(minutes/60);
+              var days = Math.floor(hours/24);
+              var months = Math.floor(days/30);
+              var time;
+              if (months !== 0) {
+                  time = months === 1 ? months + " month ago" : months + " months ago";
+              } else if (days !== 0) {
+                  time = days === 1 ? days + " day ago" : days + " days ago";
+              } else if (hours !== 0) {
+                  time = hours === 1 ? hours + " hour ago" : hours + " hours ago";
+              } else if (minutes !== 0) {
+                  time = minutes === 1 ? minutes + " minute ago" : minutes + " minutes ago";
+              } else {
+                  time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
+              } %>
+
+              <%= time %>
+          | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
       </div>
     </div>
     <% } %>

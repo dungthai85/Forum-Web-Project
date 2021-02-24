@@ -31,9 +31,33 @@
               href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&home=curr&page=<%= page.currentPage %>">👍</a>
         <% } %>
       <% } %>
-      <%= post[0].points %> points by <a href="#" class="noline">
+      <%= post[0].points %> points by
       <%= post[0].username %>
-      </a> | 
+        |
+      <%             
+              var currentTime = new Date();
+              currentTime.setHours(currentTime.getHours() + 8);
+              var timediff = currentTime - post[0].posted;
+              var seconds = Math.floor((timediff)/1000);
+              var minutes = Math.floor(seconds/60);
+              var hours = Math.floor(minutes/60);
+              var days = Math.floor(hours/24);
+              var months = Math.floor(days/30);
+              var time;
+              if (months !== 0) {
+                  time = months === 1 ? months + " month ago" : months + " months ago";
+              } else if (days !== 0) {
+                  time = days === 1 ? days + " day ago" : days + " days ago";
+              } else if (hours !== 0) {
+                  time = hours === 1 ? hours + " hour ago" : hours + " hours ago";
+              } else if (minutes !== 0) {
+                  time = minutes === 1 ? minutes + " minute ago" : minutes + " minutes ago";
+              } else {
+                  time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
+              } %>
+
+              <%= time %>
+      | 
 
     <!-- If youre logged in, you can add a comment -->
     <% if (user !== undefined) { %>
@@ -108,9 +132,32 @@
                       href="/api/comments/commentlike?like=like&topic=<%= comments[j].commentid%>&page=<%= page.currentPage %>">👍</a>
                 <% } %>
               <% } %>
-              <%= comments[j].points %> points by <a href="#" class="noline">
+              <%= comments[j].points %> points by
               <%= comments[j].username %>
-                          </a> 
+                          |
+                          <%             
+              var currentTime = new Date();
+              currentTime.setHours(currentTime.getHours() + 8);
+              var timediff = currentTime - comments[j].posted;
+              var seconds = Math.floor((timediff)/1000);
+              var minutes = Math.floor(seconds/60);
+              var hours = Math.floor(minutes/60);
+              var days = Math.floor(hours/24);
+              var months = Math.floor(days/30);
+              var time;
+              if (months !== 0) {
+                  time = months === 1 ? months + " month ago" : months + " months ago";
+              } else if (days !== 0) {
+                  time = days === 1 ? days + " day ago" : days + " days ago";
+              } else if (hours !== 0) {
+                  time = hours === 1 ? hours + " hour ago" : hours + " hours ago";
+              } else if (minutes !== 0) {
+                  time = minutes === 1 ? minutes + " minute ago" : minutes + " minutes ago";
+              } else {
+                  time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
+              } %>
+
+              <%= time %>
             </p>
       </div>
     </div>
