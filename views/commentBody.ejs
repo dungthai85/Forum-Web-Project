@@ -10,8 +10,8 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
               <% var t=post[0].topicid %>
-                <li><a class="nav-link" href="/api/topics/editpost?topic=<%= t %>">Edit</a></li>
-                <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>">Delete</a></li>
+                <li><a class="nav-link" href="/api/topics/editpost?topic=<%= t %>&page=<%= page.currentPage %>">Edit</a></li>
+                <li><a class="nav-link" href="/api/topics/deletepost?topic=<%= t %>&page=<%= page.currentPage %>">Delete</a></li>
             </ul>
           </div>
         <% } %>
@@ -48,7 +48,7 @@
         <div class="card">
           <div class="card-body">
             <blockquote class="blockquote mb-0">
-              <form action="http://34.220.239.52:3000/api/comments/addcomment?<%= [post[0].topicid]  %>" method="POST">
+              <form action="http://localhost:3000/api/comments/addcomment?<%= [post[0].topicid]  %>" method="POST">
                 <div class="mb-3">
                   <label for="commdesc" class="form-label">Description</label>
                   <textarea class="form-control" id="commdesc" rows="5" name="desc" required></textarea>
