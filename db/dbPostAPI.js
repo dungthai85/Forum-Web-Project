@@ -42,3 +42,4 @@ exports.editComment = function editComment(commentdetails, commentid) {
     query = `UPDATE COMMENTS SET commentdetails = ? WHERE commentid = ?;`;
     return db.query(query, [commentdetails, commentid]).catch(error => { return handleDBError(error) });
 }
+

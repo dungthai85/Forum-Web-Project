@@ -118,6 +118,12 @@ exports.addCommentLikes = function addCommentLikes(topicid, userid) {
     return db.query(query, [topicid, topicid, topicid, userid]).then(rows => {return rows}).catch(err => {return handleDBError(err)});
 }
 
+exports.deleteComment = function deleteComment(commentid, topicid) {
+        // Query db to delete comment
+        var sql = `DELETE FROM COMMENTS WHERE commentid = ?; UPDATE TOPICS SET comments = comments - 1 WHERE topicid = ?; DELETE FROM CLIKES WHERE commentid = ?`;
+        return db.query(sql, [commentid, topicid, commentid]).catch(error => {return handleDBError(error)});
+}
+
 /**
  * Function does the calculation for pagination
  * @param {Contains the request} req 

@@ -98,9 +98,10 @@ router.post('/editcomment', function (req, res) {
     var page = body[2];
     if (commentdetails && commentid && topicid && page) {
         // Promise to edit the comment
-        dbPostAPI.editComment(commentdetails, commentid).then(() => {
-            res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
-        }).catch(error => {throw error});
+        dbPostAPI.editComment(commentdetails, commentid)
+            .then(() => {
+                res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+            }).catch(error => {throw error});
     } else {
         res.sendStatus(500);
     }
@@ -112,17 +113,11 @@ router.get('/deletecomment', function (req, res) {
     var commentid = req.query.comment;
     var page = req.query.page;
     if (commentid && topicid && page) {
-        // Query db for the delete post
-        var sql = `DELETE FROM COMMENTS WHERE commentid = ?; UPDATE TOPICS SET comments = comments - 1 WHERE topicid = ? ;`;
-        db.query(sql, [commentid, topicid]).then((rows, err) => {
-            if (err) {
-                res.send(err);
-            } else {
+        // Promise to delete comment
+        dbGetAPI.deleteComment(commentid, topicid)
+            .then(() => {
                 res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
-            }
-        }).catch(err => {
-            res.status(503).send({ message: "The server is not ready to handle the request." });
-        });
+            }).catch(error => {throw error});
     }
 });
 
@@ -133,10 +128,11 @@ router.get('/commentlike', function (req, res) {
     var userid = req.user.id;
     if (topicid && page && userid) {
         // Promise to add comment likes
-        dbGetAPI.addCommentLikes(topicid, userid)
-            .then((rows) => {
+        dbGetAPI.addCommentLikes(topicid, userid);
+        
+            // .then((rows) => {
                 res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}&page=${page}`);
-            }).catch(error => {throw error});
+            // }).catch(error => {throw error});
     }
 });
 
