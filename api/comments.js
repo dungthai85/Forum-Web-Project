@@ -128,11 +128,10 @@ router.get('/commentlike', function (req, res) {
     var userid = req.user.id;
     if (topicid && page && userid) {
         // Promise to add comment likes
-        dbGetAPI.addCommentLikes(topicid, userid);
-        
-            // .then((rows) => {
+        dbGetAPI.addCommentLikes(topicid, userid)
+            .then((rows) => {
                 res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}&page=${page}`);
-            // }).catch(error => {throw error});
+            }).catch(error => {throw error});
     }
 });
 
