@@ -31,12 +31,11 @@
               href="/api/topics/addlike?like=like&topic=<%= post[0].topicid%>&home=curr&page=<%= page.currentPage %>">👍</a>
         <% } %>
       <% } %>
-      <%= post[0].points %> points by
-      <%= post[0].username %>
+      <%= post[0].points %> upvotes
         |
       <%             
               var currentTime = new Date();
-              currentTime.setHours(currentTime.getHours() + 8);
+              currentTime.setHours(currentTime.getHours() );
               var timediff = currentTime - post[0].posted;
               var seconds = Math.floor((timediff)/1000);
               var minutes = Math.floor(seconds/60);
@@ -56,7 +55,8 @@
                   time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
               } %>
 
-              <%= time %>
+              <%= time %> by
+              <%= post[0].username %>
       | 
 
     <!-- If youre logged in, you can add a comment -->
@@ -132,12 +132,12 @@
                       href="/api/comments/commentlike?like=like&topic=<%= comments[j].commentid%>&page=<%= page.currentPage %>">👍</a>
                 <% } %>
               <% } %>
-              <%= comments[j].points %> points by
+              <%= comments[j].points %> upvotes by
               <%= comments[j].username %>
                           |
                           <%             
               var currentTime = new Date();
-              currentTime.setHours(currentTime.getHours() + 8);
+              currentTime.setHours(currentTime.getHours() );
               var timediff = currentTime - comments[j].posted;
               var seconds = Math.floor((timediff)/1000);
               var minutes = Math.floor(seconds/60);
@@ -157,7 +157,8 @@
                   time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
               } %>
 
-              <%= time %>
+              <%= time %> by
+              <%= comments[j].username %>
             </p>
       </div>
     </div>

@@ -53,7 +53,7 @@ exports.getComments = function getComments(req) {
             var page = pagination(req, row[0][1][0].commentlength, 10);
             tableTopics = row[0][0];
             // Second query to get table for comments
-            var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? ORDER BY commentid DESC LIMIT ?, ?;`;
+            var query2 = `SELECT * FROM COMMENTS WHERE topicid = ? ORDER BY commentid LIMIT ?, ?;`;
             return [db.query(query2, [topicid, page.countStart, page.countEnd]), page, tableTopics];
         });
     }

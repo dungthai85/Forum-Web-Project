@@ -26,11 +26,11 @@
                 <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
             <% } %>
           <% } %>
-          <%= topics[i].points %> points by <%= topics[i].username %>
+          <%= topics[i].points %> upvotes
           |
           <%             
               var currentTime = new Date();
-              currentTime.setHours(currentTime.getHours() + 8);
+              currentTime.setHours(currentTime.getHours() );
               var timediff = currentTime - topics[i].posted;
               var seconds = Math.floor((timediff)/1000);
               var minutes = Math.floor(seconds/60);
@@ -50,7 +50,7 @@
                   time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
               } %>
 
-              <%= time %>
+              <%= time %>  by <%= topics[i].username %>
           | <a href="/api/comments/?topic=<%= topics[i].topicid%>" class="noline"><%= topics[i].comments %> comments</a></p>
       </div>
     </div>
