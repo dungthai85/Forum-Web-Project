@@ -124,14 +124,23 @@ router.get('/deletecomment', function (req, res) {
 // Increment comment like
 router.get('/commentlike', function (req, res) {
     var topicid = req.query.topic;
+    var commentid = req.query.comment;
     var page = req.query.page;
     var userid = req.user.id;
     if (topicid && page && userid) {
-        // Promise to add comment likes
-        dbGetAPI.addCommentLikes(topicid, userid)
-            .then((rows) => {
-                res.redirect(`/api/comments/?topic=${rows[0][1][0].topicid}&page=${page}`);
-            }).catch(error => {throw error});
+        // Promise to get the comment likes
+        dbGetAPI.getCLikes(req, { 0: { commentid: parseInt(commentid) } })
+        .then(clikes => {
+            if (clikes[0][1].length !== 0) {
+                dbGetAPI.updateCommentLikes(commentid, userid, true).then(() => {
+                    res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+                }).catch(error => {throw error});
+            } else {
+                dbGetAPI.updateCommentLikes(commentid, userid, false).then(() => {
+                    res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+                }).catch(error => {throw error});
+            }
+        });
     }
 });
 

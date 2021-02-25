@@ -35,11 +35,11 @@ router.get('/', validateToken, function (req, res) {
             var currentTime = new Date();
             currentTime.setHours(currentTime.getHours() + 8);
             var timediff = currentTime - tableTopics[1].posted;
-            var seconds = Math.floor((timediff)/1000);
-            var minutes = Math.floor(seconds/60);
-            var hours = Math.floor(minutes/60);
-            var days = Math.floor(hours/24);
-            var months = Math.floor(days/30);
+            var seconds = Math.floor((timediff) / 1000);
+            var minutes = Math.floor(seconds / 60);
+            var hours = Math.floor(minutes / 60);
+            var days = Math.floor(hours / 24);
+            var months = Math.floor(days / 30);
             var time;
             if (months !== 0) {
                 time = months === 1 ? months + " month ago" : months + " months ago";
@@ -58,9 +58,9 @@ router.get('/', validateToken, function (req, res) {
 
 
 
-            hours = hours-(days*24);
-            minutes = minutes-(days*24*60)-(hours*60);
-            seconds = seconds-(days*24*60*60)-(hours*60*60)-(minutes*60);
+            hours = hours - (days * 24);
+            minutes = minutes - (days * 24 * 60) - (hours * 60);
+            seconds = seconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
 
             res.render('../views/index', {
                 topics: tableTopics, user: req.user, userLikes: userLikes, page: page
@@ -97,8 +97,8 @@ router.post('/addpost', function (req, res) {
         dbPostAPI.addPost(userid, username, topictitle, topicdesc)
             .then(() => {
                 res.redirect('/api/topics/');
-                })
-            .catch(error => {throw error});
+            })
+            .catch(error => { throw error });
     } else {
         console.log("Missing Information");
         res.sendStatus(500);
@@ -115,7 +115,7 @@ router.get('/editpost', function (req, res) {
         dbGetAPI.getSinglePost(topicid)
             .then(post => {
                 res.render('../views/editpost.ejs', { post: post[0], user: user, page: { currentPage: page } });
-            }).catch(error => {throw error});
+            }).catch(error => { throw error });
     } else {
         res.sendStatus(500);
     }
@@ -128,10 +128,10 @@ router.post('/editpost', function (req, res) {
     var topicid = req.body.tid;
     if (topictitle && topicdetails && topicid) {
         // Get Edit post promise 
-        dbPostAPI.editPost(topictitle, topicdetails,topicid)
+        dbPostAPI.editPost(topictitle, topicdetails, topicid)
             .then(() => {
                 res.redirect('/api/topics/');
-            }).catch(error => {throw error});
+            }).catch(error => { throw error });
     } else {
         res.sendStatus(500);
     }
@@ -147,7 +147,7 @@ router.get('/deletepost', function (req, res) {
         dbGetAPI.getSinglePost(topicid)
             .then(post => {
                 res.render('../views/deletepost', { post: post[0], user: user, page: { currentPage: page } });
-            }).catch(error => {throw error});
+            }).catch(error => { throw error });
     } else {
         res.sendStatus(500);
     }
@@ -161,7 +161,7 @@ router.post('/deletepost', function (req, res) {
         dbPostAPI.deletePost(topicid)
             .then(() => {
                 res.redirect(`/api/topics`);
-            }).catch(error => {throw error});
+            }).catch(error => { throw error });
     }
 });
 
@@ -172,20 +172,38 @@ router.get('/addlike', function (req, res) {
     var home = req.query.home;
     var userid = req.user.id;
     if (topicid && page && home && userid) {
-        // Promise to update the likes
-        dbGetAPI.addTopicLikes(topicid, userid)
-            .then(() => {
-                if (home === "home") {
-                    if (page) {
-                        res.redirect(`/api/topics/?page=${page}`);
-                    } else {
-                        res.redirect('/api/topics/');
-                    }
-                } else {
-                    res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
-                }            
-            }).catch(error => {throw error});
+        // Promise to get the table likes
+        dbGetAPI.getTLikes(req, { first: { topicid: topicid } }).then(tlikes => {
+            if (tlikes.length !== 0) {
+                // Promise to delete the likes
+                dbGetAPI.updateTopicLikes(topicid, userid, true)
+                    .then(() => {
+                        routeAfterLike(res, page, topicid, home);
+                    })
+                    .catch(error => { throw error });
+            } else {
+                // Promise to add the likes
+                dbGetAPI.updateTopicLikes(topicid, userid, false)
+                    .then(() => {
+                        routeAfterLike(res, page, topicid, home);
+                    })
+                    .catch(error => { throw error });
+            }
+        }).catch(error => { throw error });
     }
 });
+
+function routeAfterLike(res, page, topicid, home) {
+    if (home === "home") {
+        if (page) {
+            res.redirect(`/api/topics/?page=${page}`);
+        } else {
+            res.redirect('/api/topics/');
+        }
+    } else {
+        res.redirect(`/api/comments/?topic=${topicid}&page=${page}`);
+    }
+
+}
 
 module.exports = router;

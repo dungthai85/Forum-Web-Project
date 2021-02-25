@@ -20,11 +20,7 @@
       <div class="card-footer text-muted">
         <p style="font-size: small;">
           <% if (user !== undefined && topics[i].userid !== user.id ) { %>
-            <% if (Object.keys(userLikes).length === 0) { %>
-              <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
-              <% } else if (!userLikes[user.id] || !userLikes[user.id].includes(topics[i].topicid)) { %>
-                <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
-            <% } %>
+            <a class="noline" href="/api/topics/addlike?like=like&topic=<%= topics[i].topicid%>&home=home&page=<%= page.currentPage %>">👍</a>
           <% } %>
           <%= topics[i].points %> upvotes
           |
@@ -38,13 +34,13 @@
               var days = Math.floor(hours/24);
               var months = Math.floor(days/30);
               var time;
-              if (months !== 0) {
+              if (months > 0) {
                   time = months === 1 ? months + " month ago" : months + " months ago";
-              } else if (days !== 0) {
+              } else if (days > 0) {
                   time = days === 1 ? days + " day ago" : days + " days ago";
-              } else if (hours !== 0) {
+              } else if (hours > 0) {
                   time = hours === 1 ? hours + " hour ago" : hours + " hours ago";
-              } else if (minutes !== 0) {
+              } else if (minutes > 0) {
                   time = minutes === 1 ? minutes + " minute ago" : minutes + " minutes ago";
               } else {
                   time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";

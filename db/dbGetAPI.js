@@ -91,10 +91,15 @@ exports.getSinglePost = function getSinglePost(topicid) {
  * @param {Current topic id} topicid 
  * @param {Current user id} userid 
  */
-exports.addTopicLikes = function addTopicLikes(topicid, userid) {
+exports.updateTopicLikes = function updateTopicLikes(topicid, userid, like) {
      // Query to get the row
-     var query = `UPDATE TOPICS SET points = points + 1 WHERE topicid = ?; INSERT INTO TLIKES (topicid, userid) VALUES ( ? , ?);`;
-     return db.query(query, [topicid, topicid, userid]).then(likes => {return likes}).catch(err => { return handleDBError(err) });
+     if (like) {
+        var query = `UPDATE TOPICS SET points = points - 1 WHERE topicid = ?; DELETE FROM TLIKES WHERE topicid = ? AND userid = ?`;
+        return db.query(query, [topicid, topicid, userid]).catch(err => { return handleDBError(err) });
+     } else {
+        var query = `UPDATE TOPICS SET points = points + 1 WHERE topicid = ?; INSERT INTO TLIKES (topicid, userid) VALUES ( ? , ?);`;
+        return db.query(query, [topicid, topicid, userid]).catch(err => { return handleDBError(err) });
+     }
 }
 
 /**
@@ -112,10 +117,15 @@ exports.editSingleComment = function editSingleComment(commentid) {
  * @param {Current topic id} topicid 
  * @param {Current user id} userid 
  */
-exports.addCommentLikes = function addCommentLikes(topicid, userid) {
+exports.updateCommentLikes = function updateCommentLikes(topicid, userid, like) {
     // Query to update the comment likes
-    var query = `UPDATE COMMENTS SET points = points + 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?; INSERT INTO CLIKES (commentid, userid) VALUES ( ? , ?);`;
-    return db.query(query, [topicid, topicid, topicid, userid]).then(rows => {return rows}).catch(err => {return handleDBError(err)});
+    if (like) {
+        var query = `UPDATE COMMENTS SET points = points - 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?; DELETE FROM CLIKES WHERE commentid = ? AND userid = ?;`;
+        return db.query(query, [topicid, topicid, topicid, userid]).then(rows => {return rows}).catch(err => {return handleDBError(err)});
+    } else {
+        var query = `UPDATE COMMENTS SET points = points + 1 WHERE commentid = ? ; SELECT * FROM COMMENTS WHERE commentid = ?; INSERT INTO CLIKES (commentid, userid) VALUES ( ? , ?);`;
+        return db.query(query, [topicid, topicid, topicid, userid]).then(rows => {return rows}).catch(err => {return handleDBError(err)});
+    }
 }
 
 exports.deleteComment = function deleteComment(commentid, topicid) {
