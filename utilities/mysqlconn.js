@@ -21,7 +21,7 @@ const connection = mysql.createPool({
     // connection.query(sql1).then(row => {
     //     console.log("Created");
     // }).catch(err =>{
-    //     console.log(err)
+    //     console.log("Couldn't Connect: " + err)
     // })
 
 module.exports = connection;
