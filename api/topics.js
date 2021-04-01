@@ -32,35 +32,35 @@ router.get('/', validateToken, function (req, res) {
                     }
                 }
             }
-            var currentTime = new Date();
-            currentTime.setHours(currentTime.getHours() + 8);
-            var timediff = currentTime - tableTopics[1].posted;
-            var seconds = Math.floor((timediff) / 1000);
-            var minutes = Math.floor(seconds / 60);
-            var hours = Math.floor(minutes / 60);
-            var days = Math.floor(hours / 24);
-            var months = Math.floor(days / 30);
-            var time;
-            if (months !== 0) {
-                time = months === 1 ? months + " month ago" : months + " months ago";
-            } else if (days !== 0) {
-                time = days === 1 ? days + " day ago" : days + " days ago";
-            } else if (hours !== 0) {
-                time = hours === 1 ? hours + " hour ago" : hours + " hours ago";
-            } else if (minutes !== 0) {
-                time = minutes === 1 ? minutes + " minute ago" : minutes + " minutes ago";
-            } else {
-                time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
-            }
-            // console.log(time);
+            // var currentTime = new Date();
+            // currentTime.setHours(currentTime.getHours() + 8);
+            // var timediff = currentTime - tableTopics[1].posted;
+            // var seconds = Math.floor((timediff) / 1000);
+            // var minutes = Math.floor(seconds / 60);
+            // var hours = Math.floor(minutes / 60);
+            // var days = Math.floor(hours / 24);
+            // var months = Math.floor(days / 30);
+            // var time;
+            // if (months !== 0) {
+            //     time = months === 1 ? months + " month ago" : months + " months ago";
+            // } else if (days !== 0) {
+            //     time = days === 1 ? days + " day ago" : days + " days ago";
+            // } else if (hours !== 0) {
+            //     time = hours === 1 ? hours + " hour ago" : hours + " hours ago";
+            // } else if (minutes !== 0) {
+            //     time = minutes === 1 ? minutes + " minute ago" : minutes + " minutes ago";
+            // } else {
+            //     time = seconds === 1 ? seconds + " second ago" : seconds + " seconds ago";
+            // }
+            // // console.log(time);
 
 
 
 
 
-            hours = hours - (days * 24);
-            minutes = minutes - (days * 24 * 60) - (hours * 60);
-            seconds = seconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
+            // hours = hours - (days * 24);
+            // minutes = minutes - (days * 24 * 60) - (hours * 60);
+            // seconds = seconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
 
             res.render('../views/index', {
                 topics: tableTopics, user: req.user, userLikes: userLikes, page: page
