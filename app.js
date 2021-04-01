@@ -51,6 +51,10 @@ app.use('/api/topics', topicrouter);
 // Routes to add, edit, and delete comments
 app.use('/api/comments', commentrouter);
 
+app.get('/', function (req, res) {
+    res.send("TESTING");
+})
+
 
 // Opens server to listen to port 3000
 app.listen(3000, function () {
